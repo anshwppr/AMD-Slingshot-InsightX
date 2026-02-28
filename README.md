@@ -77,7 +77,7 @@ Digital Hygiene is an AI-powered, explainable post-quantum cybersecurity defense
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/digital-hygiene.git
+git clone https://github.com/anshwppr/AMD-Slingshot-InsightX
 cd digital-hygiene
 ```
 
