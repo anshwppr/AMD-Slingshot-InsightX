@@ -1,0 +1,27 @@
+{
+  "detection_accuracy": 90.8,
+  "response_accuracy": 90.2,
+  "pq_detection_accuracy": 89.64451313755795,
+  "pq_response_accuracy": 98.60896445131375,
+  "f1_score": 0.9064921814032177,
+  "precision": 0.9131828091100135,
+  "recall": 0.908,
+  "avg_confidence": 83.16872752159834,
+  "avg_reward": 51.9525,
+  "lora_config": {
+    "rank": 8,
+    "alpha": 16,
+    "dropout": 0.1,
+    "use_lora": true,
+    "lora_layers": "all"
+  },
+  "lora_params": 14744,
+  "total_params": 185970,
+  "param_efficiency": 92.07183954401248,
+  "adapter_size_mb": 0.060631752014160156,
+  "base_accuracy": 89.2,
+  "lora_accuracy": 90.8,
+  "improvement": 1.5999999999999943,
+  "training_time_seconds": 604.9387834072113,
+  "timestamp": "2026-02-26T16:52:56.367037"
+}

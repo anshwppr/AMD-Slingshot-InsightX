@@ -1,0 +1,14 @@
+{
+  "detection_accuracy": 89.2,
+  "response_accuracy": 88.1,
+  "pq_detection_accuracy": 82.92682926829268,
+  "pq_response_accuracy": 96.64634146341463,
+  "f1_score": 0.8900837805445823,
+  "avg_confidence": 79.89611319452524,
+  "avg_reward": 49.7075,
+  "simulation_accuracy": 90.0,
+  "simulation_final_health": 90.0,
+  "total_parameters": 217890,
+  "model_size_mb": 0.87156,
+  "timestamp": "2026-02-26T16:39:32.755491"
+}

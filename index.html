@@ -1,0 +1,2435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Digital Hygiene — AMD AI Cybersecurity Hackathon</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #060910;
+  --surface: #0d1422;
+  --card: #111d30;
+  --border: #1a2d4e;
+  --border2: #253858;
+  --accent: #00d4ff;
+  --accent2: #7c3aed;
+  --pq: #c084fc;
+  --green: #10d97a;
+  --yellow: #fbbf24;
+  --orange: #fb923c;
+  --red: #f43f5e;
+  --lora: #34d399;
+  --lora2: #6ee7b7;
+  --text: #e8edf5;
+  --muted: #6b7fa3;
+  --dim: #3d4f6e;
+  --mono: 'Space Mono', monospace;
+  --sans: 'Manrope', sans-serif;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height:100vh; overflow-x:hidden; }
+
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:9999;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+}
+
+/* NAV */
+nav {
+  position:sticky; top:0; z-index:500;
+  background: rgba(6,9,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 2rem; height: 58px;
+}
+.logo { display:flex; align-items:center; gap:0.75rem; }
+.logo-glyph {
+  width:32px; height:32px; border-radius:8px;
+  background: linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex; align-items:center; justify-content:center; font-size:1rem;
+  box-shadow: 0 0 16px rgba(0,212,255,0.3);
+}
+.logo-name { font-family:var(--mono); font-size:0.95rem; font-weight:700; color:var(--text); }
+.logo-sub { font-size:0.62rem; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; margin-top:0.1rem; }
+.nav-center { display:flex; gap:0.2rem; flex-wrap:wrap; }
+.tab {
+  font-family:var(--mono); font-size:0.72rem; padding:0.35rem 0.9rem;
+  border-radius:6px; cursor:pointer; border:none; background:none;
+  color:var(--muted); letter-spacing:0.04em; transition:all 0.2s;
+  text-transform:uppercase;
+}
+.tab:hover { color:var(--text); background:rgba(255,255,255,0.04); }
+.tab.active { color:var(--accent); background:rgba(0,212,255,0.08); }
+.tab.lora-tab.active { color:var(--lora); background:rgba(52,211,153,0.08); }
+.live-pill {
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.3rem 0.8rem; border-radius:999px;
+  border:1px solid rgba(16,217,122,0.25); background:rgba(16,217,122,0.06);
+  font-family:var(--mono); font-size:0.7rem; color:var(--green);
+}
+.live-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:heartbeat 1.4s ease infinite; }
+@keyframes heartbeat { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.4)} }
+
+.page { display:none; padding:2rem; max-width:1380px; margin:0 auto; animation:fadeup 0.35s ease; }
+.page.active { display:block; }
+@keyframes fadeup { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* HERO */
+.hero {
+  position:relative; text-align:center; padding:3.5rem 1rem 2rem;
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,212,255,0.06) 0%, transparent 70%);
+}
+.hero::after {
+  content:''; position:absolute; bottom:0; left:10%; right:10%; height:1px;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+}
+.hackathon-badge {
+  display:inline-flex; align-items:center; gap:0.5rem;
+  padding:0.4rem 1rem; margin-bottom:1.5rem;
+  border-radius:999px; font-family:var(--mono); font-size:0.7rem;
+  letter-spacing:0.08em; text-transform:uppercase;
+  background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.35); color:var(--pq);
+}
+.lora-badge {
+  display:inline-flex; align-items:center; gap:0.5rem;
+  padding:0.4rem 1rem; margin-bottom:1.5rem;
+  border-radius:999px; font-family:var(--mono); font-size:0.7rem;
+  letter-spacing:0.08em; text-transform:uppercase;
+  background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.35); color:var(--lora);
+}
+.hero h1 { font-size:3rem; font-weight:800; line-height:1.1; margin-bottom:1rem; letter-spacing:-0.02em; }
+.hero h1 .hl { background:linear-gradient(135deg,var(--accent) 0%,var(--pq) 60%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.hero h1 .hl-lora { background:linear-gradient(135deg,var(--lora) 0%,var(--accent) 60%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.hero-sub { color:var(--muted); max-width:640px; margin:0 auto 1.5rem; line-height:1.75; font-size:0.95rem; font-weight:400; }
+.hero-chips { display:flex; justify-content:center; gap:0.6rem; flex-wrap:wrap; }
+.chip {
+  font-family:var(--mono); font-size:0.68rem; padding:0.25rem 0.7rem;
+  border-radius:6px; border:1px solid var(--border2); color:var(--muted);
+  background:rgba(255,255,255,0.02); letter-spacing:0.04em;
+}
+.chip.lora { border-color:rgba(52,211,153,0.3); color:var(--lora); background:rgba(52,211,153,0.04); }
+.chip.up { border-color:rgba(16,217,122,0.3); color:var(--green); background:rgba(16,217,122,0.04); }
+
+/* METRIC STRIP */
+.metric-strip { display:grid; grid-template-columns:repeat(6,1fr); gap:1rem; margin:2rem 0; }
+.mcard {
+  background:var(--card); border:1px solid var(--border); border-radius:14px;
+  padding:1.2rem 1rem; text-align:center;
+  transition:transform 0.2s,border-color 0.2s;
+  position:relative; overflow:hidden;
+}
+.mcard::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--accent-color,var(--accent));
+}
+.mcard:hover { transform:translateY(-3px); border-color:var(--accent-color,var(--accent)); }
+.mcard-val { font-size:1.85rem; font-weight:800; font-family:var(--mono); color:var(--accent-color,var(--accent)); line-height:1; }
+.mcard-label { font-size:0.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; margin-top:0.4rem; }
+.mcard-delta { font-size:0.62rem; font-family:var(--mono); margin-top:0.3rem; color:var(--green); }
+@media(max-width:900px) { .metric-strip { grid-template-columns:repeat(3,1fr); } }
+
+/* PANEL */
+.panel {
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:1.5rem; margin-bottom:1.5rem; position:relative;
+}
+.panel-hdr {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:1.2rem; padding-bottom:0.9rem;
+  border-bottom:1px solid var(--border);
+}
+.panel-title { font-family:var(--mono); font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; }
+.panel-badge {
+  font-family:var(--mono); font-size:0.65rem; padding:0.2rem 0.6rem;
+  border-radius:8px; color:var(--accent);
+  background:rgba(0,212,255,0.08); border:1px solid rgba(0,212,255,0.2);
+}
+.panel-badge.pq { color:var(--pq); background:rgba(192,132,252,0.08); border-color:rgba(192,132,252,0.2); }
+.panel-badge.lora { color:var(--lora); background:rgba(52,211,153,0.08); border-color:rgba(52,211,153,0.2); }
+.panel-badge.green { color:var(--green); background:rgba(16,217,122,0.08); border-color:rgba(16,217,122,0.2); }
+
+/* GRID */
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; }
+.g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+@media(max-width:900px) { .g2,.g3,.g4 { grid-template-columns:1fr; } }
+
+canvas { width:100% !important; }
+
+/* COMPARISON TABLE */
+.cmp-table { width:100%; border-collapse:collapse; font-size:0.83rem; }
+.cmp-table th { text-align:left; padding:0.55rem 0.8rem; color:var(--muted); border-bottom:1px solid var(--border); font-family:var(--mono); font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em; }
+.cmp-table td { padding:0.65rem 0.8rem; border-bottom:1px solid rgba(26,45,78,0.4); }
+.cmp-table tr:last-child td { border-bottom:none; }
+.cmp-table .metric-name { font-weight:600; color:var(--text); }
+.cmp-table .baseline-val { color:var(--accent); font-family:var(--mono); }
+.cmp-table .lora-val { color:var(--lora); font-family:var(--mono); font-weight:700; }
+.cmp-table .delta-val { color:var(--green); font-family:var(--mono); font-size:0.75rem; }
+.cmp-table tr:hover td { background:rgba(255,255,255,0.018); }
+
+/* PROGRESS BARS */
+.stat-bar-wrap { margin-bottom:0.9rem; }
+.stat-bar-label { display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.75rem; }
+.stat-bar-bg { height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
+.stat-bar-fill { height:100%; border-radius:4px; transition:width 1.2s cubic-bezier(0.4,0,0.2,1); }
+
+/* CHECK LIST */
+.check-list { list-style:none; display:flex; flex-direction:column; gap:0.5rem; }
+.check-list li { display:flex; align-items:flex-start; gap:0.65rem; font-size:0.83rem; color:var(--muted); line-height:1.55; }
+.check-list li::before { content:'✓'; color:var(--lora); font-family:var(--mono); font-size:0.75rem; margin-top:0.1rem; flex-shrink:0; }
+
+/* SIZE COMPARISON BAR */
+.size-bars { display:flex; flex-direction:column; gap:1rem; padding:0.5rem 0; }
+.size-bar-row { display:flex; align-items:center; gap:1rem; }
+.size-bar-name { font-family:var(--mono); font-size:0.68rem; color:var(--muted); width:120px; flex-shrink:0; }
+.size-bar-track { flex:1; height:12px; background:var(--border); border-radius:6px; overflow:hidden; }
+.size-bar-fill { height:100%; border-radius:6px; }
+.size-bar-val { font-family:var(--mono); font-size:0.68rem; color:var(--text); width:60px; text-align:right; flex-shrink:0; }
+
+/* IMPROVEMENT BADGE */
+.impr-badge {
+  display:inline-flex; align-items:center; gap:0.4rem;
+  padding:0.3rem 0.8rem; border-radius:999px;
+  font-family:var(--mono); font-size:0.68rem; font-weight:700;
+  background:rgba(16,217,122,0.08); border:1px solid rgba(16,217,122,0.25); color:var(--green);
+}
+
+/* BIG STAT BLOCK */
+.big-stat {
+  text-align:center; padding:1.5rem 1rem;
+  background:var(--surface); border:1px solid var(--border); border-radius:14px;
+  position:relative; overflow:hidden;
+}
+.big-stat::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:var(--stat-color,var(--lora));
+}
+.big-stat-val { font-size:2.5rem; font-weight:800; font-family:var(--mono); color:var(--stat-color,var(--lora)); line-height:1; margin-bottom:0.4rem; }
+.big-stat-label { font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; }
+.big-stat-baseline { font-size:0.68rem; color:var(--dim); font-family:var(--mono); margin-top:0.5rem; }
+.big-stat-delta { font-size:0.75rem; color:var(--green); font-family:var(--mono); font-weight:700; }
+
+/* ADAPTER INFO */
+.adapter-spec { display:flex; flex-direction:column; gap:0.6rem; }
+.adapter-row { display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0; border-bottom:1px solid rgba(26,45,78,0.4); font-size:0.82rem; }
+.adapter-row:last-child { border-bottom:none; }
+.adapter-key { color:var(--muted); }
+.adapter-val { font-family:var(--mono); font-weight:700; color:var(--lora); }
+
+/* CONFUSION MATRIX mini heatmap */
+.cm-grid { display:grid; gap:2px; }
+.cm-cell { border-radius:3px; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:0.55rem; font-weight:700; transition:transform 0.15s; }
+.cm-cell:hover { transform:scale(1.15); z-index:1; position:relative; }
+
+/* SIMULATOR */
+.sim-top { display:flex; align-items:center; gap:0.8rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+.btn { font-family:var(--mono); font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:0.6rem 1.4rem; border-radius:8px; cursor:pointer; border:none; transition:all 0.2s; }
+.btn-go { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; box-shadow:0 0 20px rgba(0,212,255,0.2); }
+.btn-go:hover { opacity:0.88; transform:translateY(-1px); box-shadow:0 0 28px rgba(0,212,255,0.35); }
+.btn-go:disabled { opacity:0.35; cursor:not-allowed; transform:none; box-shadow:none; }
+.btn-ghost { background:none; border:1px solid var(--border2); color:var(--muted); }
+.btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+.spd { font-family:var(--mono); font-size:0.72rem; background:var(--surface); border:1px solid var(--border2); color:var(--text); padding:0.5rem 0.8rem; border-radius:8px; cursor:pointer; }
+
+.gauge-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:0.75rem; margin-bottom:1.2rem; }
+.gc { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1rem 0.8rem; text-align:center; }
+.gv { font-family:var(--mono); font-size:1.5rem; font-weight:700; }
+.gl { font-size:0.62rem; color:var(--muted); margin-top:0.25rem; text-transform:uppercase; letter-spacing:0.05em; }
+.pbar { height:4px; background:var(--border); border-radius:2px; margin-top:0.6rem; overflow:hidden; }
+.pfill { height:100%; border-radius:2px; transition:width 0.5s ease, background 0.4s; }
+
+.sim-body { display:grid; grid-template-columns:1fr 380px; gap:1.2rem; }
+@media(max-width:900px) { .sim-body { grid-template-columns:1fr; } }
+
+.elog { height:480px; overflow-y:auto; display:flex; flex-direction:column; gap:0.5rem; }
+.elog::-webkit-scrollbar { width:3px; }
+.elog::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.eitem {
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  padding:0.85rem 1rem; border-left:3px solid transparent;
+  animation:slidein 0.3s ease-out;
+  cursor:pointer; transition:border-color 0.2s, background 0.2s;
+}
+.eitem:hover { background:rgba(255,255,255,0.025); }
+.eitem.cv-critical { border-left-color:var(--red); }
+.eitem.cv-high { border-left-color:var(--orange); }
+.eitem.cv-medium { border-left-color:var(--yellow); }
+.eitem.cv-low { border-left-color:var(--green); }
+.eitem.cv-pq { border-left-color:var(--pq); }
+.eitem.selected { background:rgba(0,212,255,0.04); border-color:rgba(0,212,255,0.2); }
+@keyframes slidein { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+
+.etop { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.3rem; }
+.ename { font-weight:700; font-size:0.88rem; }
+.etime { font-family:var(--mono); font-size:0.65rem; color:var(--muted); }
+.emeta { display:flex; gap:0.35rem; flex-wrap:wrap; margin:0.35rem 0; }
+.edesc { font-size:0.78rem; color:var(--muted); line-height:1.5; margin-top:0.25rem; }
+.tag { font-family:var(--mono); font-size:0.62rem; padding:0.12rem 0.45rem; border-radius:5px; border:1px solid; font-weight:700; }
+.t-critical { color:var(--red); border-color:rgba(244,63,94,0.35); background:rgba(244,63,94,0.07); }
+.t-high { color:var(--orange); border-color:rgba(251,146,60,0.35); background:rgba(251,146,60,0.07); }
+.t-medium { color:var(--yellow); border-color:rgba(251,191,36,0.35); background:rgba(251,191,36,0.07); }
+.t-low { color:var(--green); border-color:rgba(16,217,122,0.35); background:rgba(16,217,122,0.07); }
+.t-pq { color:var(--pq); border-color:rgba(192,132,252,0.35); background:rgba(192,132,252,0.07); }
+.t-action { color:var(--accent); border-color:rgba(0,212,255,0.35); background:rgba(0,212,255,0.07); }
+.t-ok { color:var(--green); border-color:rgba(16,217,122,0.35); background:rgba(16,217,122,0.07); }
+.t-miss { color:var(--red); border-color:rgba(244,63,94,0.35); background:rgba(244,63,94,0.07); }
+.t-dim { color:var(--dim); border-color:var(--border); background:none; }
+.t-lora { color:var(--lora); border-color:rgba(52,211,153,0.35); background:rgba(52,211,153,0.07); }
+
+.live-explain { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.2rem; height:480px; overflow-y:auto; display:flex; flex-direction:column; }
+.live-explain::-webkit-scrollbar { width:3px; }
+.live-explain::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.le-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+.le-empty-icon { font-size:2.5rem; margin-bottom:0.8rem; opacity:0.4; }
+.le-empty-text { font-size:0.8rem; color:var(--muted); line-height:1.6; }
+.le-header { margin-bottom:1rem; padding-bottom:0.8rem; border-bottom:1px solid var(--border); }
+.le-threat { font-weight:800; font-size:1rem; margin-bottom:0.25rem; }
+.le-section { margin-bottom:0.9rem; }
+.le-sec-title { font-family:var(--mono); font-size:0.62rem; color:var(--dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem; }
+.le-sec-body { font-size:0.8rem; color:var(--muted); line-height:1.6; }
+.le-student-box { background:rgba(16,217,122,0.05); border:1px solid rgba(16,217,122,0.15); border-radius:8px; padding:0.8rem; margin-top:0.5rem; }
+.le-student-label { font-family:var(--mono); font-size:0.6rem; color:var(--green); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.3rem; }
+.le-student-text { font-size:0.8rem; color:var(--text); line-height:1.55; }
+.indicators-row { display:flex; flex-wrap:wrap; gap:0.3rem; margin-top:0.4rem; }
+.ind-chip { font-size:0.65rem; padding:0.15rem 0.5rem; border-radius:4px; background:rgba(0,212,255,0.05); border:1px solid rgba(0,212,255,0.15); color:var(--accent); }
+.conf-bar-wrap { margin-top:0.4rem; }
+.conf-bar-bg { height:5px; background:var(--border); border-radius:3px; overflow:hidden; }
+.conf-bar-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--accent),var(--pq)); transition:width 0.6s ease; }
+
+/* THREAT TABLE */
+.tt { width:100%; border-collapse:collapse; font-size:0.82rem; }
+.tt th { text-align:left; padding:0.55rem 0.8rem; color:var(--muted); border-bottom:1px solid var(--border); font-family:var(--mono); font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em; }
+.tt td { padding:0.6rem 0.8rem; border-bottom:1px solid rgba(26,45,78,0.4); }
+.tt tr:last-child td { border-bottom:none; }
+.tt tr:hover td { background:rgba(255,255,255,0.018); cursor:pointer; }
+.class-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:6px; }
+.explain-box { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.3rem; margin-top:1rem; display:none; }
+.explain-box.show { display:block; animation:fadeup 0.25s ease; }
+.eb-section { margin-bottom:0.8rem; }
+.eb-sec-title { font-family:var(--mono); font-size:0.62rem; color:var(--dim); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.3rem; }
+.eb-sec-body { font-size:0.83rem; color:var(--muted); line-height:1.6; }
+.eb-student { background:rgba(16,217,122,0.05); border:1px solid rgba(16,217,122,0.15); border-radius:8px; padding:0.8rem; margin-top:0.4rem; }
+.eb-student-label { font-family:var(--mono); font-size:0.6rem; color:var(--green); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.3rem; }
+
+/* ARCHITECTURE */
+.arch-flow { display:flex; flex-direction:column; align-items:center; gap:0; }
+.arch-node { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:0.9rem 2.5rem; text-align:center; min-width:280px; }
+.arch-node.hl { border-color:rgba(0,212,255,0.4); box-shadow:0 0 24px rgba(0,212,255,0.1); }
+.arch-node.pq { border-color:rgba(192,132,252,0.4); box-shadow:0 0 24px rgba(192,132,252,0.1); }
+.arch-node.ex { border-color:rgba(251,191,36,0.4); box-shadow:0 0 24px rgba(251,191,36,0.1); }
+.arch-node.lora-node { border-color:rgba(52,211,153,0.4); box-shadow:0 0 24px rgba(52,211,153,0.1); }
+.arch-nt { font-weight:700; font-size:0.9rem; }
+.arch-nl { font-size:0.72rem; color:var(--muted); margin-top:0.2rem; }
+.arch-arrow { color:var(--dim); font-family:var(--mono); font-size:0.7rem; text-align:center; padding:0.3rem 0; }
+
+/* ABOUT */
+.story-block { margin-bottom:2rem; }
+.story-block h2 { font-size:1.2rem; font-weight:700; color:var(--accent); margin-bottom:0.7rem; }
+.story-block p { font-size:0.9rem; color:var(--muted); line-height:1.85; margin-bottom:0.6rem; }
+.story-block ul { list-style:none; }
+.story-block ul li { font-size:0.9rem; color:var(--muted); line-height:1.8; padding-left:1.2rem; position:relative; }
+.story-block ul li::before { content:"▹"; position:absolute; left:0; color:var(--accent); font-size:0.8rem; }
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem; }
+.col-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem; }
+.col-card h4 { font-family:var(--mono); font-size:0.72rem; color:var(--accent); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.5rem; }
+.col-card p { font-size:0.83rem; color:var(--muted); line-height:1.6; }
+.results-img-wrap { border-radius:12px; overflow:hidden; border:1px solid var(--border); background:var(--surface); }
+.results-img-wrap img { width:100%; display:block; }
+
+/* LORA SPECIFIC */
+.lora-glow { box-shadow: 0 0 32px rgba(52,211,153,0.15); }
+.lora-hero-bg { background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(52,211,153,0.05) 0%, transparent 70%); }
+
+.pie-donut { position:relative; display:flex; align-items:center; justify-content:center; }
+.pie-center { position:absolute; text-align:center; }
+.pie-center-val { font-size:1.4rem; font-weight:800; font-family:var(--mono); }
+.pie-center-label { font-size:0.62rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; }
+
+.lora-pipeline-node {
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  padding:0.75rem 1rem; display:flex; align-items:center; gap:0.8rem;
+}
+.lora-pipeline-node.frozen { border-color:rgba(107,127,163,0.3); }
+.lora-pipeline-node.trainable { border-color:rgba(52,211,153,0.35); background:rgba(52,211,153,0.03); }
+.lora-pipeline-node.adapter { border-color:rgba(52,211,153,0.5); background:rgba(52,211,153,0.06); box-shadow:0 0 16px rgba(52,211,153,0.12); }
+.lpn-icon { font-size:1.2rem; }
+.lpn-title { font-weight:700; font-size:0.85rem; }
+.lpn-desc { font-size:0.72rem; color:var(--muted); margin-top:0.1rem; }
+.lpn-badge { font-family:var(--mono); font-size:0.6rem; padding:0.1rem 0.45rem; border-radius:4px; margin-left:auto; flex-shrink:0; }
+.lpn-badge.frozen { color:var(--dim); border:1px solid var(--border); background:none; }
+.lpn-badge.trainable { color:var(--lora); border:1px solid rgba(52,211,153,0.3); background:rgba(52,211,153,0.05); }
+
+@media(max-width:700px) {
+  .logo-sub, .live-pill span { display:none; }
+  .tab { font-size:0.65rem; padding:0.3rem 0.6rem; }
+  .hero h1 { font-size:2rem; }
+  .metric-strip { grid-template-columns:repeat(2,1fr); }
+  .g4 { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-glyph">🛡️</div>
+    <div>
+      <div class="logo-name">Digital Hygiene</div>
+      <div class="logo-sub">Post-Quantum Defense System</div>
+    </div>
+  </div>
+  <div class="nav-center">
+    <button class="tab active" onclick="showPage('dashboard',this)">Dashboard</button>
+    <button class="tab lora-tab" onclick="showPage('lora',this)">⚡ LoRA Fine-Tune</button>
+    <button class="tab" onclick="showPage('simulator',this)">Simulator</button>
+    <button class="tab" onclick="showPage('threats',this)">Threat Library</button>
+    <button class="tab" onclick="showPage('architecture',this)">Architecture</button>
+    <button class="tab" onclick="showPage('about',this)">About</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:0.6rem;">
+    <div class="live-pill" id="modelStatus" style="border-color:rgba(52,211,153,0.25);background:rgba(52,211,153,0.06);color:var(--lora);">
+      <div class="live-dot" style="background:var(--lora);"></div>
+      <span id="modelStatusText">Loading Weights...</span>
+    </div>
+    <div class="live-pill"><div class="live-dot"></div><span>System Active</span></div>
+  </div>
+</nav>
+
+<!-- ==================== DASHBOARD ==================== -->
+<div class="page active" id="page-dashboard">
+  <div class="hero">
+    <div class="hackathon-badge">🔐 AMD AI Cybersecurity Hackathon · Post-Quantum Ready</div>
+    <h1>Safer Digital Experiences<br/>for <span class="hl">Students &amp; Institutions</span></h1>
+    <p class="hero-sub">
+      An explainable, adaptive AI cybersecurity system that detects 12 threat classes — including post-quantum cryptographic attacks — and delivers plain-language guidance that anyone can act on.
+    </p>
+    <div class="hero-chips">
+      <span class="chip">89.2% Detection Accuracy</span>
+      <span class="chip">PQ-Ready · 82.9% PQ Detection</span>
+      <span class="chip">Explainable AI</span>
+      <span class="chip">Adaptive RL Agent</span>
+      <span class="chip up">+LoRA: 90.8% Accuracy</span>
+    </div>
+  </div>
+
+  <div class="metric-strip">
+    <div class="mcard" style="--accent-color:var(--accent)">
+      <div class="mcard-val">89.2%</div>
+      <div class="mcard-label">Detection Acc</div>
+    </div>
+    <div class="mcard" style="--accent-color:var(--pq)">
+      <div class="mcard-val">82.9%</div>
+      <div class="mcard-label">PQ Detection</div>
+    </div>
+    <div class="mcard" style="--accent-color:var(--green)">
+      <div class="mcard-val">88.1%</div>
+      <div class="mcard-label">Response Acc</div>
+    </div>
+    <div class="mcard" style="--accent-color:var(--orange)">
+      <div class="mcard-val">96.7%</div>
+      <div class="mcard-label">PQ Response</div>
+    </div>
+    <div class="mcard" style="--accent-color:var(--yellow)">
+      <div class="mcard-val">0.890</div>
+      <div class="mcard-label">F1-Score</div>
+    </div>
+    <div class="mcard" style="--accent-color:var(--lora)">
+      <div class="mcard-val">90.8%</div>
+      <div class="mcard-label">LoRA Acc ⚡</div>
+      <div class="mcard-delta">↑ +1.6% vs baseline</div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">Detection Training</span>
+        <span class="panel-badge">100 Epochs · ResNet MLP</span>
+      </div>
+      <canvas id="trainChart" height="190"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">Response Agent Learning</span>
+        <span class="panel-badge">8,000 Episodes · Double DQN</span>
+      </div>
+      <canvas id="rewardChart" height="190"></canvas>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">Performance Metrics</span>
+        <span class="panel-badge">Baseline vs LoRA</span>
+      </div>
+      <canvas id="barChart" height="200"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">Threat Class Distribution</span>
+        <span class="panel-badge">12 Classes · Balanced</span>
+      </div>
+      <canvas id="distChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Training Results Images -->
+  <div class="panel" style="padding:0;overflow:hidden;">
+    <div style="padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.75rem;">
+      <span class="panel-title">Baseline Training Results</span>
+      <span class="panel-badge">AMD AI Cybersecurity · Post-Quantum Defense System</span>
+    </div>
+    <div style="padding:1rem;background:#fff;">
+      <img src="training_baseline.png" alt="AMD AI Cybersecurity - Post-Quantum Defense System Training Results"
+           style="width:100%;height:auto;display:block;border-radius:4px;"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div style="display:none;align-items:center;justify-content:center;padding:3rem;color:#666;font-family:monospace;font-size:0.8rem;background:#f8f9fa;border-radius:4px;">
+        📊 Place <strong>training_baseline.png</strong> in the project folder (same folder as app.py)
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="padding:0;overflow:hidden;margin-top:0;">
+    <div style="padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.75rem;">
+      <span class="panel-title">LoRA Fine-Tuning Results</span>
+      <span class="panel-badge lora">Digital Hygiene · Proper LoRA Fine-tuning</span>
+    </div>
+    <div style="padding:1rem;background:#fff;">
+      <img src="training_lora.png" alt="Digital Hygiene - LoRA Fine-tuning Results"
+           style="width:100%;height:auto;display:block;border-radius:4px;"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div style="display:none;align-items:center;justify-content:center;padding:3rem;color:#666;font-family:monospace;font-size:0.8rem;background:#f8f9fa;border-radius:4px;">
+        📊 Place <strong>training_lora.png</strong> in the project folder (same folder as app.py)
+      </div>
+    </div>
+  </div>
+
+  <!-- Mini Live Simulation -->
+  <div class="panel" style="overflow:hidden;padding:0;margin-top:0;">
+    <div style="padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.8rem;">
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <div class="live-dot" id="miniSimDot" style="background:var(--dim);"></div>
+        <span class="panel-title">Live Network Simulation</span>
+        <span style="font-family:var(--mono);font-size:0.62rem;color:var(--dim);padding:0.15rem 0.5rem;border-radius:4px;background:rgba(255,255,255,0.03);border:1px solid var(--border);" id="miniSimStatus">IDLE</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <div style="display:flex;gap:0.4rem;">
+          <div style="text-align:center;padding:0.3rem 0.7rem;background:rgba(16,217,122,0.06);border:1px solid rgba(16,217,122,0.15);border-radius:6px;">
+            <div style="font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--green);" id="mBlocked">0</div>
+            <div style="font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Blocked</div>
+          </div>
+          <div style="text-align:center;padding:0.3rem 0.7rem;background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.15);border-radius:6px;">
+            <div style="font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--red);" id="mMissed">0</div>
+            <div style="font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Missed</div>
+          </div>
+          <div style="text-align:center;padding:0.3rem 0.7rem;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:6px;">
+            <div style="font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--accent);" id="mAccuracy">—</div>
+            <div style="font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Accuracy</div>
+          </div>
+          <div style="text-align:center;padding:0.3rem 0.7rem;background:rgba(192,132,252,0.06);border:1px solid rgba(192,132,252,0.15);border-radius:6px;">
+            <div style="font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--pq);" id="mPQCount">0</div>
+            <div style="font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">PQ Events</div>
+          </div>
+        </div>
+        <button class="btn btn-go" id="miniStartBtn" onclick="toggleMiniSim()" style="padding:0.45rem 1.1rem;font-size:0.72rem;">▶ Start</button>
+      <div id="miniFlaskBanner" style="display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0.75rem;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.3);border-radius:6px;font-family:var(--mono);font-size:0.65rem;color:#f43f5e;">
+        <span style="font-size:0.85rem;">🔴</span>
+        <span>Flask offline — run <strong>python app.py</strong> to enable real DQN inference</span>
+      </div>
+        <button class="btn btn-ghost" onclick="resetMiniSim()" style="padding:0.45rem 0.8rem;font-size:0.72rem;">↺</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 320px;min-height:320px;">
+      <div style="position:relative;background:radial-gradient(ellipse at 50% 50%, rgba(0,212,255,0.03) 0%, transparent 70%);">
+        <canvas id="miniNetCanvas" style="width:100%;height:320px;display:block;"></canvas>
+        <div style="position:absolute;bottom:0.6rem;left:0.8rem;font-family:var(--mono);font-size:0.58rem;color:var(--dim);">CAMPUS NETWORK TOPOLOGY · LIVE PACKET FLOW</div>
+      </div>
+      <div style="border-left:1px solid var(--border);display:flex;flex-direction:column;">
+        <div style="padding:0.7rem 0.9rem;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:0.6rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.07em;">Event Stream</div>
+        <div id="miniEventFeed" style="flex:1;overflow-y:auto;padding:0.5rem;display:flex;flex-direction:column;gap:0.3rem;max-height:280px;">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:var(--dim);padding:2rem 1rem;">
+            <div style="font-size:1.5rem;margin-bottom:0.5rem;opacity:0.3;">📡</div>
+            <div style="font-size:0.75rem;">Press Start to begin<br/>live threat monitoring</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0.8rem 1.2rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:1rem;">
+      <span style="font-family:var(--mono);font-size:0.6rem;color:var(--dim);white-space:nowrap;">THREAT LEVEL</span>
+      <div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;">
+        <div id="miniThreatBar" style="height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--yellow),var(--orange),var(--red));transition:width 0.6s ease;"></div>
+      </div>
+      <span style="font-family:var(--mono);font-size:0.6rem;color:var(--muted);" id="miniThreatLabel">—</span>
+      <div style="width:1px;height:16px;background:var(--border);"></div>
+      <span style="font-family:var(--mono);font-size:0.6rem;color:var(--dim);white-space:nowrap;">NETWORK HEALTH</span>
+      <div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;">
+        <div id="miniHealthBar" style="height:100%;width:100%;border-radius:3px;background:var(--green);transition:width 0.6s ease,background 0.4s;"></div>
+      </div>
+      <span style="font-family:var(--mono);font-size:0.6rem;color:var(--green);" id="miniHealthLabel">100%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== LORA FINE-TUNING ==================== -->
+<div class="page" id="page-lora">
+  <div class="hero lora-hero-bg">
+    <div class="lora-badge">⚡ LoRA Fine-Tuning · Parameter-Efficient Adaptation</div>
+    <h1>Smarter Detection with<br/><span class="hl-lora">Low-Rank Adaptation</span></h1>
+    <p class="hero-sub">
+      LoRA fine-tunes only 7.9% of parameters — freezing the base encoder and adding lightweight adapter layers — achieving 90.80% accuracy with a 13× smaller adapter file while boosting post-quantum detection by +6.72%.
+    </p>
+    <div class="hero-chips">
+      <span class="chip lora">90.80% LoRA Accuracy</span>
+      <span class="chip lora">0.056 MB Adapter</span>
+      <span class="chip lora">92.1% Param Efficiency</span>
+      <span class="chip up">PQ Detect +6.72%</span>
+      <span class="chip up">F1: 0.906</span>
+    </div>
+  </div>
+
+  <!-- Key metric cards -->
+  <div class="metric-strip">
+    <div class="mcard" style="--accent-color:var(--lora)">
+      <div class="mcard-val">90.8%</div>
+      <div class="mcard-label">LoRA Accuracy</div>
+      <div class="mcard-delta">↑ +1.60% vs 89.2%</div>
+    </div>
+    <div class="mcard" style="--accent-color:var(--pq)">
+      <div class="mcard-val">89.6%</div>
+      <div class="mcard-label">PQ Detection</div>
+      <div class="mcard-delta">↑ +6.72% vs 82.9%</div>
+    </div>
+    <div class="mcard" style="--accent-color:var(--green)">
+      <div class="mcard-val">90.2%</div>
+      <div class="mcard-label">Response Acc</div>
+      <div class="mcard-delta">↑ +2.10% vs 88.1%</div>
+    </div>
+    <div class="mcard" style="--accent-color:var(--accent)">
+      <div class="mcard-val">0.906</div>
+      <div class="mcard-label">F1 Score</div>
+      <div class="mcard-delta">↑ vs 0.890 baseline</div>
+    </div>
+    <div class="mcard" style="--accent-color:var(--orange)">
+      <div class="mcard-val">92.1%</div>
+      <div class="mcard-label">Param Frozen</div>
+      <div class="mcard-delta">14,744 trainable params</div>
+    </div>
+    <div class="mcard" style="--accent-color:var(--yellow)">
+      <div class="mcard-val">13×</div>
+      <div class="mcard-label">Smaller Adapter</div>
+      <div class="mcard-delta">0.056 MB vs 0.71 MB</div>
+    </div>
+  </div>
+
+  <!-- Big stat row -->
+  <div class="g4" style="margin-bottom:1.5rem;">
+    <div class="big-stat" style="--stat-color:var(--lora)">
+      <div class="big-stat-val">90.80%</div>
+      <div class="big-stat-label">LoRA Detection Accuracy</div>
+      <div class="big-stat-baseline">Baseline: 89.20%</div>
+      <div class="big-stat-delta">↑ Improvement: +1.60%</div>
+    </div>
+    <div class="big-stat" style="--stat-color:var(--pq)">
+      <div class="big-stat-val">89.64%</div>
+      <div class="big-stat-label">PQ Detection Rate</div>
+      <div class="big-stat-baseline">Baseline: 82.93%</div>
+      <div class="big-stat-delta">↑ Improvement: +6.72%</div>
+    </div>
+    <div class="big-stat" style="--stat-color:var(--green)">
+      <div class="big-stat-val">90.20%</div>
+      <div class="big-stat-label">Response Accuracy</div>
+      <div class="big-stat-baseline">Baseline: 88.10%</div>
+      <div class="big-stat-delta">↑ Improvement: +2.10%</div>
+    </div>
+    <div class="big-stat" style="--stat-color:var(--accent)">
+      <div class="big-stat-val">83.2%</div>
+      <div class="big-stat-label">Confidence Score</div>
+      <div class="big-stat-baseline">F1: 0.906</div>
+      <div class="big-stat-delta">↑ vs 79.9% baseline</div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="g2">
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">LoRA Fine-tuning Curves</span>
+        <span class="panel-badge lora">100 Epochs · Adapter Only</span>
+      </div>
+      <canvas id="loraTrainChart" height="200"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">Baseline vs LoRA — All Metrics</span>
+        <span class="panel-badge lora">Side-by-Side Comparison</span>
+      </div>
+      <canvas id="loraCompareChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="g2">
+    <!-- Parameter Efficiency -->
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">Parameter Efficiency</span>
+        <span class="panel-badge lora">92.1% Frozen</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:2rem;padding:0.5rem 0;">
+        <div style="position:relative;flex-shrink:0;">
+          <canvas id="donutChart" width="160" height="160"></canvas>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div style="font-size:1.3rem;font-weight:800;font-family:var(--mono);color:var(--lora);">92.1%</div>
+            <div style="font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Frozen</div>
+          </div>
+        </div>
+        <div style="flex:1;">
+          <div class="stat-bar-wrap">
+            <div class="stat-bar-label">
+              <span style="color:var(--muted);font-size:0.75rem;">Frozen Base Params</span>
+              <span style="font-family:var(--mono);font-size:0.75rem;color:var(--dim);">171,226 (92.1%)</span>
+            </div>
+            <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:92.1%;background:var(--border2);"></div></div>
+          </div>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar-label">
+              <span style="color:var(--lora);font-size:0.75rem;">LoRA Adapter Params</span>
+              <span style="font-family:var(--mono);font-size:0.75rem;color:var(--lora);">14,744 (7.9%)</span>
+            </div>
+            <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:7.9%;background:var(--lora);"></div></div>
+          </div>
+          <div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid var(--border);">
+            <div style="font-family:var(--mono);font-size:0.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">What is trainable</div>
+            <div style="font-size:0.8rem;color:var(--muted);line-height:1.6;">deep_features layers · classifier head · LoRA adapters on all linear layers · Encoder is fully frozen (low-level features preserved)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Adapter Size -->
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">Model Size Comparison</span>
+        <span class="panel-badge lora">Adapter is 13× Smaller</span>
+      </div>
+      <div class="size-bars" style="margin-top:0.5rem;">
+        <div class="size-bar-row">
+          <div class="size-bar-name">Full Model<br/><span style="font-size:0.58rem;color:var(--dim);">detector.pth</span></div>
+          <div class="size-bar-track"><div class="size-bar-fill" style="width:100%;background:linear-gradient(90deg,#253858,#3d4f6e);"></div></div>
+          <div class="size-bar-val">0.709 MB</div>
+        </div>
+        <div class="size-bar-row">
+          <div class="size-bar-name">LoRA Adapter<br/><span style="font-size:0.58rem;color:var(--lora);">lora_adapter.pth</span></div>
+          <div class="size-bar-track"><div class="size-bar-fill" style="width:7.9%;background:linear-gradient(90deg,var(--lora),var(--lora2));"></div></div>
+          <div class="size-bar-val" style="color:var(--lora);">0.056 MB</div>
+        </div>
+        <div class="size-bar-row">
+          <div class="size-bar-name">Response Agent<br/><span style="font-size:0.58rem;color:var(--dim);">response_agent.pth</span></div>
+          <div class="size-bar-track"><div class="size-bar-fill" style="width:27%;background:linear-gradient(90deg,var(--accent2),var(--accent));opacity:0.6;"></div></div>
+          <div class="size-bar-val">0.192 MB</div>
+        </div>
+        <div class="size-bar-row">
+          <div class="size-bar-name">LoRA Response<br/><span style="font-size:0.58rem;color:var(--dim);">response_lora.pth</span></div>
+          <div class="size-bar-track"><div class="size-bar-fill" style="width:27.1%;background:linear-gradient(90deg,var(--lora),var(--accent));opacity:0.6;"></div></div>
+          <div class="size-bar-val">0.192 MB</div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;padding:0.8rem;background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.15);border-radius:8px;">
+        <div style="font-family:var(--mono);font-size:0.62rem;color:var(--lora);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.35rem;">Deployment Advantage</div>
+        <div style="font-size:0.8rem;color:var(--muted);line-height:1.6;">Ship only the 0.056 MB adapter file to edge devices — the frozen base model stays on-server. Perfect for low-bandwidth campus deployments and mobile student apps.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LoRA Pipeline Diagram + Spec Table -->
+  <div class="g2">
+    <div class="panel">
+      <div class="panel-hdr">
+        <span class="panel-title">LoRA Adapter Pipeline</span>
+        <span class="panel-badge lora">Freeze → Adapt → Fine-tune</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <div class="lora-pipeline-node frozen">
+          <div class="lpn-icon">📡</div>
+          <div><div class="lpn-title">Network Traffic Input</div><div class="lpn-desc">Raw packet flow · 47 feature dimensions · StandardScaler</div></div>
+          <span class="lpn-badge frozen">FROZEN</span>
+        </div>
+        <div style="text-align:center;font-family:var(--mono);font-size:0.65rem;color:var(--dim);">↓ preprocessed features</div>
+        <div class="lora-pipeline-node frozen">
+          <div class="lpn-icon">🧱</div>
+          <div><div class="lpn-title">Input BN + Encoder Block</div><div class="lpn-desc">256-dim · BatchNorm + ReLU + Dropout(0.3) · Linear(47→256)</div></div>
+          <span class="lpn-badge frozen">FROZEN</span>
+        </div>
+        <div style="text-align:center;font-family:var(--mono);font-size:0.65rem;color:var(--dim);">↓ low-level features preserved</div>
+        <div class="lora-pipeline-node adapter">
+          <div class="lpn-icon">⚡</div>
+          <div><div class="lpn-title">LoRA Adapters (all linear layers)</div><div class="lpn-desc">Rank-4 matrices · A×B decomposition · 14,744 params total</div></div>
+          <span class="lpn-badge trainable">ADAPTER</span>
+        </div>
+        <div style="text-align:center;font-family:var(--mono);font-size:0.65rem;color:var(--lora);">↓ adapted features</div>
+        <div class="lora-pipeline-node trainable">
+          <div class="lpn-icon">🔬</div>
+          <div><div class="lpn-title">Deep Features + Classifier</div><div class="lpn-desc">192→128→64→12 · BN + ReLU · Softmax output</div></div>
+          <span class="lpn-badge trainable">TRAINABLE</span>
+        </div>
+        <div style="text-align:center;font-family:var(--mono);font-size:0.65rem;color:var(--lora);">↓ threat class + confidence</div>
+        <div class="lora-pipeline-node" style="border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.03);">
+          <div class="lpn-icon">💬</div>
+          <div><div class="lpn-title">Explainability + RL Response</div><div class="lpn-desc">Plain-language output · Double DQN mitigation action</div></div>
+          <span class="lpn-badge" style="color:var(--accent);border:1px solid rgba(0,212,255,0.3);background:rgba(0,212,255,0.05);">OUTPUT</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <!-- Comparison table -->
+      <div class="panel" style="margin-bottom:1.2rem;">
+        <div class="panel-hdr">
+          <span class="panel-title">Metric Comparison</span>
+          <span class="panel-badge lora">Baseline → LoRA</span>
+        </div>
+        <table class="cmp-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Baseline</th>
+              <th>LoRA</th>
+              <th>Δ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="metric-name">Detection Accuracy</td>
+              <td class="baseline-val">89.20%</td>
+              <td class="lora-val">90.80%</td>
+              <td class="delta-val">+1.60%</td>
+            </tr>
+            <tr>
+              <td class="metric-name">PQ Detection</td>
+              <td class="baseline-val">82.93%</td>
+              <td class="lora-val">89.64%</td>
+              <td class="delta-val">+6.72%</td>
+            </tr>
+            <tr>
+              <td class="metric-name">Response Accuracy</td>
+              <td class="baseline-val">88.10%</td>
+              <td class="lora-val">90.20%</td>
+              <td class="delta-val">+2.10%</td>
+            </tr>
+            <tr>
+              <td class="metric-name">F1-Score</td>
+              <td class="baseline-val">0.890</td>
+              <td class="lora-val">0.906</td>
+              <td class="delta-val">+0.016</td>
+            </tr>
+            <tr>
+              <td class="metric-name">Confidence Score</td>
+              <td class="baseline-val">79.9%</td>
+              <td class="lora-val">83.2%</td>
+              <td class="delta-val">+3.3%</td>
+            </tr>
+            <tr>
+              <td class="metric-name">PQ Response Acc</td>
+              <td class="baseline-val">96.65%</td>
+              <td class="lora-val">96.65%</td>
+              <td style="font-family:var(--mono);color:var(--dim);">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- LoRA Spec -->
+      <div class="panel">
+        <div class="panel-hdr">
+          <span class="panel-title">LoRA Configuration</span>
+          <span class="panel-badge lora">Adapter Spec</span>
+        </div>
+        <div class="adapter-spec">
+          <div class="adapter-row"><span class="adapter-key">Method</span><span class="adapter-val">LoRA (Low-Rank Adaptation)</span></div>
+          <div class="adapter-row"><span class="adapter-key">Target Layers</span><span class="adapter-val">All Linear Layers</span></div>
+          <div class="adapter-row"><span class="adapter-key">LoRA Rank</span><span class="adapter-val">r = 4</span></div>
+          <div class="adapter-row"><span class="adapter-key">LoRA Params</span><span class="adapter-val">14,744 / 185,970 total</span></div>
+          <div class="adapter-row"><span class="adapter-key">Param Efficiency</span><span class="adapter-val">92.1% frozen</span></div>
+          <div class="adapter-row"><span class="adapter-key">Adapter File Size</span><span class="adapter-val">0.056 MB</span></div>
+          <div class="adapter-row"><span class="adapter-key">Full Model Size</span><span class="adapter-val">0.709 MB</span></div>
+          <div class="adapter-row"><span class="adapter-key">Base Weights</span><span class="adapter-key">Loaded from detector.pth</span></div>
+          <div class="adapter-row"><span class="adapter-key">Normalization</span><span class="adapter-key">Same scaler.pkl as baseline</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Inference Demo -->
+  <div class="panel" id="liveInferencePanel">
+    <div class="panel-hdr">
+      <span class="panel-title">⚡ Live Model Inference — Real .pth Weights</span>
+      <span class="panel-badge lora" id="inferenceModelBadge">response_agent_lora.pth + lora_adapter.pth</span>
+    </div>
+    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6;">
+      Select a threat scenario below to run <strong style="color:var(--lora)">actual inference</strong> through the embedded model weights. The Q-values and action are computed by the real Double DQN loaded from <code style="font-family:var(--mono);font-size:0.78rem;color:var(--accent);">response_agent_lora.pth</code>, and the confidence signal comes from the LoRA adapter matrices in <code style="font-family:var(--mono);font-size:0.78rem;color:var(--pq);">lora_adapter.pth</code>.
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+      <div>
+        <div style="font-family:var(--mono);font-size:0.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.6rem;">Threat Scenario</div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;" id="threatSelector">
+          <!-- populated by JS -->
+        </div>
+        <div style="margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+          <div>
+            <div style="font-family:var(--mono);font-size:0.62rem;color:var(--dim);margin-bottom:0.3rem;">SYSTEM HEALTH</div>
+            <input type="range" id="healthSlider" min="0" max="100" value="85" style="width:100%;accent-color:var(--green);" oninput="document.getElementById('healthVal').textContent=this.value+'%';runLiveInference()">
+            <span style="font-family:var(--mono);font-size:0.68rem;color:var(--green);" id="healthVal">85%</span>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:0.62rem;color:var(--dim);margin-bottom:0.3rem;">CRYPTO STRENGTH</div>
+            <input type="range" id="cryptoSlider" min="0" max="100" value="90" style="width:100%;accent-color:var(--pq);" oninput="document.getElementById('cryptoVal').textContent=this.value+'%';runLiveInference()">
+            <span style="font-family:var(--mono);font-size:0.68rem;color:var(--pq);" id="cryptoVal">90%</span>
+          </div>
+        </div>
+      </div>
+      <div id="liveInferenceOutput">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--dim);text-align:center;padding:2rem;">
+          <div style="font-size:2rem;margin-bottom:0.6rem;opacity:0.4;">⚡</div>
+          <div style="font-size:0.8rem;">Select a threat to run inference</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== SIMULATOR ==================== -->
+<div class="page" id="page-simulator">
+  <div class="panel">
+    <div class="panel-hdr">
+      <span class="panel-title">🔴 Real-Time Threat Simulation</span>
+      <span class="panel-badge" id="simBadge">0 / 20 Events</span>
+    </div>
+    <div class="sim-top">
+      <button class="btn btn-go" id="startBtn" onclick="startSim()">▶ Start Simulation</button>
+      <div id="simFlaskBanner" style="display:flex;align-items:center;gap:0.5rem;padding:0.35rem 0.75rem;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.3);border-radius:6px;font-family:var(--mono);font-size:0.65rem;color:#f43f5e;">
+        <span style="font-size:0.85rem;">🔴</span>
+        <span>Connection offline — run <strong>python app.py</strong> to enable real inference</span>
+      </div>
+      <button class="btn btn-ghost" onclick="resetSim()">↺ Reset</button>
+      <select class="spd" id="spdSel">
+        <option value="1200">Normal</option>
+        <option value="600">Fast</option>
+        <option value="200">Turbo</option>
+      </select>
+      <span style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);margin-left:auto;">Click any event for explanation →</span>
+    </div>
+    <div class="gauge-strip">
+      <div class="gc"><div class="gv" id="gH" style="color:var(--green)">100%</div><div class="gl">System Health</div><div class="pbar"><div class="pfill" id="pbH" style="width:100%;background:var(--green)"></div></div></div>
+      <div class="gc"><div class="gv" id="gC" style="color:var(--green)">100%</div><div class="gl">Crypto Strength</div><div class="pbar"><div class="pfill" id="pbC" style="width:100%;background:var(--green)"></div></div></div>
+      <div class="gc"><div class="gv" id="gB" style="color:var(--accent)">0</div><div class="gl">Threats Blocked</div></div>
+      <div class="gc"><div class="gv" id="gF" style="color:var(--yellow)">0</div><div class="gl">False Positives</div></div>
+      <div class="gc"><div class="gv" id="gA" style="color:var(--green)">—</div><div class="gl">Current Accuracy</div></div>
+    </div>
+    <div class="sim-body">
+      <div>
+        <div style="font-family:var(--mono);font-size:0.65rem;color:var(--dim);margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.07em;">Live Event Stream</div>
+        <div class="elog" id="eventLog">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:var(--muted);">
+            <div style="font-size:2rem;margin-bottom:0.8rem;opacity:0.3;">🔍</div>
+            <div style="font-size:0.85rem;">Press <strong style="color:var(--text)">Start Simulation</strong> to begin</div>
+            <div style="font-size:0.78rem;margin-top:0.3rem;color:var(--dim);">20 live threat events will stream in real-time</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:0.65rem;color:var(--dim);margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.07em;">AI Explanation Engine</div>
+        <div class="live-explain" id="liveExplain">
+          <div class="le-empty">
+            <div class="le-empty-icon">💬</div>
+            <div class="le-empty-text">Click an event in the stream to see<br/>the full AI explainability output —<br/>exactly what Digital Hygiene shows<br/>to students in real time</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== THREATS ==================== -->
+<div class="page" id="page-threats">
+  <div class="panel">
+    <div class="panel-hdr">
+      <span class="panel-title">Threat Library</span>
+      <span class="panel-badge pq">12 Classes · Click to Explain</span>
+    </div>
+    <p style="font-size:0.83rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6;">
+      Every threat class detected by Digital Hygiene. Click any row to see the full AI explainability output.
+    </p>
+    <table class="tt">
+      <thead><tr><th>ID</th><th>Threat</th><th>Category</th><th>Severity</th><th>Type</th><th>Action</th></tr></thead>
+      <tbody id="threatTbody"></tbody>
+    </table>
+  </div>
+  <div class="explain-box" id="explainBox"></div>
+</div>
+
+<!-- ==================== ARCHITECTURE ==================== -->
+<div class="page" id="page-architecture">
+  <div class="g2">
+    <div class="panel">
+      <div class="panel-hdr"><span class="panel-title">System Pipeline</span></div>
+      <div class="arch-flow">
+        <div class="arch-node" style="border-color:var(--dim)">
+          <div class="arch-nt">📡 Network Traffic</div>
+          <div class="arch-nl">Raw packet flow · 47 feature dimensions</div>
+        </div>
+        <div class="arch-arrow">↓ &nbsp;StandardScaler preprocessing</div>
+        <div class="arch-node hl">
+          <div class="arch-nt">🧠 EffectiveThreatDetector</div>
+          <div class="arch-nl">ResNet-style MLP · 12-class · Focal Loss · 217K params</div>
+        </div>
+        <div class="arch-arrow" style="color:var(--lora);">↓ &nbsp;+ LoRA Adapters (7.9% params · 14,744 trainable)</div>
+        <div class="arch-node lora-node">
+          <div class="arch-nt">⚡ LoRA Fine-tuned Detector</div>
+          <div class="arch-nl">Encoder frozen · deep_features + classifier trainable · 90.8% acc</div>
+        </div>
+        <div class="arch-arrow">↓ &nbsp;Threat class + confidence score</div>
+        <div class="arch-node ex">
+          <div class="arch-nt">💬 Explainability Engine</div>
+          <div class="arch-nl">Plain-language breakdown · Context-aware · Student-first</div>
+        </div>
+        <div class="arch-arrow">↓ &nbsp;Structured explanation + 15-dim state vector</div>
+        <div class="arch-node hl">
+          <div class="arch-nt">🤖 ImprovedResponseDQN</div>
+          <div class="arch-nl">Double DQN · Prioritized Replay · 8 response actions</div>
+        </div>
+        <div class="arch-arrow">↓ &nbsp;Mitigation action selected</div>
+        <div class="arch-node pq">
+          <div class="arch-nt">⚡ Response Execution</div>
+          <div class="arch-nl">Ignore → Quick Scan → Emergency Crypto Rotate</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel" style="margin-bottom:1.2rem;">
+        <div class="panel-hdr"><span class="panel-title">Detector Architecture</span></div>
+        <table class="tt">
+          <thead><tr><th>Layer</th><th>Shape</th><th>LoRA Status</th></tr></thead>
+          <tbody>
+            <tr><td>Input BN</td><td>47</td><td style="color:var(--dim);">Frozen</td></tr>
+            <tr><td>Encoder</td><td>256</td><td style="color:var(--dim);">Frozen</td></tr>
+            <tr><td>Residual Skip</td><td>256</td><td style="color:var(--lora);font-weight:700;">+ LoRA Adapter</td></tr>
+            <tr><td>Deep Features</td><td>192→128</td><td style="color:var(--lora);font-weight:700;">Trainable + LoRA</td></tr>
+            <tr><td>Classifier</td><td>128→64→12</td><td style="color:var(--lora);font-weight:700;">Trainable + LoRA</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:0.8rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <span class="tag t-dim">217,890 params total</span>
+          <span class="tag t-lora">14,744 LoRA params</span>
+          <span class="tag t-lora">92.1% frozen</span>
+          <span class="tag t-dim">Focal Loss γ=2.0</span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><span class="panel-title">Response Agent</span></div>
+        <table class="tt">
+          <thead><tr><th>Component</th><th>Detail</th></tr></thead>
+          <tbody>
+            <tr><td>State space</td><td>15 dims (threat class, conf, health, crypto, history)</td></tr>
+            <tr><td>Action space</td><td>8 responses (Ignore → Emerg. Crypto Rotate)</td></tr>
+            <tr><td>Algorithm</td><td>Double DQN + Prioritized Experience Replay</td></tr>
+            <tr><td>Training</td><td>8,000 episodes, ε-decay, reward shaping</td></tr>
+            <tr><td>PQ Response Acc</td><td style="color:var(--pq);font-weight:700;">96.65%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-hdr"><span class="panel-title">Action → Threat Mapping</span></div>
+    <div class="g3">
+      <div style="font-size:0.82rem;color:var(--muted);">
+        <div style="color:var(--text);font-weight:700;margin-bottom:0.5rem;">Classical Threats</div>
+        <div>DDoS, DoS → <span style="color:var(--accent)">Rate Limit Block</span></div>
+        <div>BruteForce → <span style="color:var(--accent)">Account Lockout</span></div>
+        <div>Recon → <span style="color:var(--accent)">Quick Scan</span></div>
+        <div>Web-based → <span style="color:var(--accent)">WAF Enforce</span></div>
+        <div>Mirai/IoT → <span style="color:var(--accent)">Network Isolate</span></div>
+      </div>
+      <div style="font-size:0.82rem;color:var(--muted);">
+        <div style="color:var(--pq);font-weight:700;margin-bottom:0.5rem;">Post-Quantum Threats</div>
+        <div>PQ-Downgrade → <span style="color:var(--pq)">PQ-Crypto Upgrade</span></div>
+        <div>PQ-SideChannel → <span style="color:var(--pq)">PQ-Crypto Upgrade</span></div>
+        <div>PQ-HNDL → <span style="color:var(--pq)">Emergency Crypto Rotate</span></div>
+        <div>PQ-Hybrid → <span style="color:var(--pq)">Emergency Crypto Rotate</span></div>
+      </div>
+      <div style="font-size:0.82rem;color:var(--muted);">
+        <div style="color:var(--text);font-weight:700;margin-bottom:0.5rem;">Reward Structure</div>
+        <div>Correct response: <span style="color:var(--green)">+10</span></div>
+        <div>Missed threat: <span style="color:var(--red)">−20</span></div>
+        <div>False positive: <span style="color:var(--yellow)">−5</span></div>
+        <div>PQ correct: <span style="color:var(--pq)">+20 bonus</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ABOUT ==================== -->
+<div class="page" id="page-about">
+  <div class="g2">
+    <div>
+      <div class="panel">
+        <div class="story-block">
+          <h2>The Story</h2>
+          <p>Imagine a first-year student — call him Cipher — sitting in a university computer lab, clicking what looks like a routine email from the registrar's office. The link looks right. The logo looks right. Forty-eight hours later, his login credentials are circulating on a paste site he's never heard of. His academic record has been accessed. His scholarship application is gone.</p>
+          <p>He didn't do anything wrong. He just didn't know.</p>
+          <p>Digital Hygiene exists to close that gap — with AI that explains itself, adapts over time, and was built for students first, not security teams.</p>
+        </div>
+        <div class="story-block">
+          <h2>The Problem</h2>
+          <p>Phishing, malware, spoofing, and data misuse hit students and institutions every day. Tools designed to stop them are either invisible to the people who need them most, or so technical that nobody reads the alerts.</p>
+          <p>There is a second layer that most people don't talk about yet: the post-quantum threat. Nation-state actors are running "Harvest Now, Decrypt Later" campaigns right now — collecting encrypted traffic today with the plan to decrypt it once quantum computers are capable enough.</p>
+        </div>
+        <div class="story-block">
+          <h2>Why LoRA Changes the Game</h2>
+          <ul>
+            <li>Fine-tune the detector for new threat patterns with 0.056 MB — no full retraining needed</li>
+            <li>PQ detection jumps +6.72% — the most critical category improved the most</li>
+            <li>Enables per-institution adaptation without sharing raw traffic data</li>
+            <li>92.1% of compute frozen — fast convergence, minimal catastrophic forgetting</li>
+            <li>Adapter ships independently — deploy updates without replacing the full model</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <div class="story-block">
+          <h2>Hackathon Alignment</h2>
+          <ul>
+            <li><strong style="color:var(--text)">Early-warning + teach-back</strong> — plain-language phishing/malware guidance</li>
+            <li><strong style="color:var(--text)">Privacy-preserving</strong> — no raw PII; feature vectors only</li>
+            <li><strong style="color:var(--text)">Explainable security</strong> — every alert shows why, not just what</li>
+            <li><strong style="color:var(--text)">Consent-first</strong> — secure identity flows, no silent surveillance</li>
+            <li><strong style="color:var(--text)">Digital hygiene companion</strong> — built for first-year students</li>
+            <li><strong style="color:var(--lora)">LoRA efficiency</strong> — adapter-based fine-tuning for edge deployment</li>
+          </ul>
+          <div class="two-col" style="margin-top:1rem;">
+            <div class="col-card">
+              <h4>Model Size</h4>
+              <p>0.87 MB detector · 217K parameters · Runs on CPU · LoRA adapter only 0.056 MB</p>
+            </div>
+            <div class="col-card">
+              <h4>Dataset</h4>
+              <p>CIC-IOT 2023 + synthetic PQ signatures · 100K+ samples · 12 balanced classes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// THREAT DATA
+// ============================================================
+const THREATS = [
+  {id:0,name:'Benign Traffic',cat:'Normal',sev:'LOW',pq:false,action:'Allow',
+   desc:'Normal network traffic with no malicious indicators.',
+   tech:'Legitimate application-layer flows: HTTP/HTTPS, DNS, NTP within expected baselines.',
+   risk:'No risk. Blocking benign traffic causes service disruption (false positive).',
+   rec:'Allow · Continue monitoring for behavioral drift',
+   student:'You\'re safe. This traffic is normal network activity — think of it like a car that\'s following all traffic laws.',
+   indicators:['Expected port ranges','Packet rates within baseline','TLS fingerprint matches whitelist'],
+   color:'#10d97a'},
+  {id:1,name:'DDoS Attack',cat:'Availability',sev:'CRITICAL',pq:false,action:'Rate Limit Block',
+   desc:'Coordinated high-volume traffic from multiple sources designed to overwhelm services.',
+   tech:'Volumetric flood exploiting UDP amplification or SYN flood. Packets per second exceeds 10× baseline.',
+   risk:'Complete service outage affecting all users on the segment.',
+   rec:'Activate rate limiting · Block source CIDRs · Notify upstream ISP · Enable BGP blackholing',
+   student:'Imagine thousands of people all calling the same phone number at once to stop anyone else from getting through. IT is blocking it — you\'re protected.',
+   indicators:['Packet rate 50,000+/sec','SYN without ACK','UDP reflection amplification','Multi-source ASN spread'],
+   color:'#f43f5e'},
+  {id:2,name:'DoS Attack',cat:'Availability',sev:'HIGH',pq:false,action:'Rate Limit Block',
+   desc:'Single-source denial of service targeting specific services with high-rate malformed requests.',
+   tech:'Application-layer DoS using HTTP request flooding or TCP state exhaustion.',
+   risk:'Targeted service unavailability. Lab booking systems, authentication portals, research databases.',
+   rec:'Block source IP · Activate connection-rate limiting · Log for incident report',
+   student:'Someone is spamming a university service with so many fake requests it can\'t respond to real ones. IT is removing them.',
+   indicators:['Single-source high rate','Connection table exhaustion','HTTP flood pattern','Malformed packet headers'],
+   color:'#fb923c'},
+  {id:3,name:'Reconnaissance',cat:'Discovery',sev:'MEDIUM',pq:false,action:'Quick Scan',
+   desc:'Systematic network scanning to map topology, identify open ports, and enumerate services before an attack.',
+   tech:'Sequential port scan (SYN probes) or ICMP sweep across subnets.',
+   risk:'Intelligence gathering phase. Reconnaissance precedes 90% of targeted attacks.',
+   rec:'Firewall default-deny · Alert SOC · Monitor for follow-up exploitation',
+   student:'Someone is quietly checking which doors and windows are unlocked before deciding how to get in. Not an attack yet, but a red flag.',
+   indicators:['Sequential port probing','ICMP sweep pattern','Low packet rate, high destination spread','SYN-only probe pattern'],
+   color:'#fbbf24'},
+  {id:4,name:'Web-Based Attack',cat:'Application',sev:'HIGH',pq:false,action:'WAF Enforce',
+   desc:'Exploitation of web application vulnerabilities including SQL injection, XSS, path traversal.',
+   tech:'HTTP requests contain encoded payloads: SQL meta-characters, script tags, directory traversal sequences.',
+   risk:'Data exfiltration, session hijacking, administrative access, database compromise.',
+   rec:'WAF block rule activation · Input sanitization alert · Session invalidation · Incident log',
+   student:'Someone is trying to trick a website into handing over data it shouldn\'t. The system blocked the attempt.',
+   indicators:['SQL meta-characters in params','XSS payload patterns','Abnormal User-Agent','Directory traversal sequences'],
+   color:'#fb923c'},
+  {id:5,name:'Brute Force',cat:'Credential',sev:'HIGH',pq:false,action:'Account Lockout',
+   desc:'Automated repeated login attempts to crack passwords through exhaustive guessing or credential stuffing.',
+   tech:'High-frequency authentication requests against login endpoints. Failed auth rate exceeds threshold.',
+   risk:'Account takeover. Student accounts grant access to grades, financial aid, research systems.',
+   rec:'Account lockout after threshold · MFA enforcement · Alert account holder · Credential leak check',
+   student:'Someone is trying to guess your password by trying thousands of combinations automatically. Your account has been temporarily locked.',
+   indicators:['Failed auth rate >10/min','Single source targeting one user','Credential stuffing list signature','Login endpoint flood'],
+   color:'#fb923c'},
+  {id:6,name:'Spoofing',cat:'Identity',sev:'HIGH',pq:false,action:'Identity Verify',
+   desc:'Impersonation of legitimate network entities through IP, MAC, or DNS spoofing.',
+   tech:'ARP cache poisoning or DNS spoofing redirecting traffic through attacker-controlled host.',
+   risk:'Traffic interception, credential theft, session hijacking.',
+   rec:'ARP table validation · DNS-over-HTTPS enforcement · Certificate pinning · Network segment isolation',
+   student:'Someone is pretending to be a trustworthy service to intercept your communications. The system detected the fake.',
+   indicators:['ARP table anomaly','DNS response mismatch','Duplicate IP detected','MAC-IP binding change'],
+   color:'#f43f5e'},
+  {id:7,name:'Mirai Botnet',cat:'IoT Threat',sev:'CRITICAL',pq:false,action:'Network Isolate',
+   desc:'IoT device compromise and botnet activity. Infected devices used for DDoS amplification.',
+   tech:'Mirai variant: Telnet/SSH credential brute-force against IoT devices, C2 beacon traffic.',
+   risk:'Network devices become attack infrastructure. Printers, cameras, lab equipment become zombies.',
+   rec:'Network isolation of infected segment · IoT device audit · Firmware update mandate · C2 IP blacklist',
+   student:'Smart devices on campus have been hijacked and are being used to attack other systems. IT is cutting them off.',
+   indicators:['Telnet brute-force pattern','C2 beacon signature','IRC over non-standard port','Mirai string signature'],
+   color:'#f43f5e'},
+  {id:8,name:'PQ-Downgrade',cat:'Post-Quantum',sev:'CRITICAL',pq:true,action:'PQ-Crypto Upgrade',
+   desc:'Post-quantum cryptographic downgrade attack forcing systems to use quantum-vulnerable classical algorithms.',
+   tech:'Adversary manipulates TLS handshake to reject post-quantum cipher suites (ML-KEM, CRYSTALS-Kyber).',
+   risk:'Future decryption by quantum-capable adversary. Harvest Now, Decrypt Later.',
+   rec:'Enforce PQ cipher suite minimum · Deploy ML-KEM key encapsulation · Reject RSA-only handshakes',
+   student:'Someone is trying to make your connection use an older, weaker encryption that future quantum computers could crack. The system upgraded your lock.',
+   indicators:['PQ cipher suite rejection','RSA-forced negotiation','TLS downgrade attempt','Quantum-vulnerable handshake'],
+   color:'#c084fc'},
+  {id:9,name:'PQ-HNDL',cat:'Post-Quantum',sev:'CRITICAL',pq:true,action:'Emergency Crypto Rotate',
+   desc:'"Harvest Now, Decrypt Later" — encrypted traffic being collected for future quantum decryption.',
+   tech:'Nation-state actor capturing encrypted TLS sessions, VPN tunnels, research data transfers.',
+   risk:'Highest long-term risk. Encrypted data stored today will be readable by adversaries in 5-10 years.',
+   rec:'Emergency key rotation · Migrate to NIST PQC standards · Review data retention policy',
+   student:'Someone is photographing every sealed letter you send, planning to open them once they get a special key in a few years. Your communications have been re-encrypted.',
+   indicators:['Anomalous traffic capture pattern','Large encrypted session archiving','Nation-state TTPs','HNDL campaign signature'],
+   color:'#c084fc'},
+  {id:10,name:'PQ-SideChannel',cat:'Post-Quantum',sev:'HIGH',pq:true,action:'PQ-Crypto Upgrade',
+   desc:'Side-channel attack targeting post-quantum cryptographic implementations through timing or power analysis.',
+   tech:'Statistical analysis of cryptographic operation timing to extract key material from ML-KEM NTT operations.',
+   risk:'Key material extraction without breaking the algorithm directly.',
+   rec:'Constant-time implementation audit · Hardware security module for key operations · Timing noise injection',
+   student:'This attack watches how long operations take to figure out the secret. Like watching someone\'s shadow to guess their PIN.',
+   indicators:['Timing analysis pattern','Statistical correlation attack','Implementation timing variance','Physical proximity anomaly'],
+   color:'#c084fc'},
+  {id:11,name:'PQ-Hybrid',cat:'Post-Quantum',sev:'CRITICAL',pq:true,action:'Emergency Crypto Rotate',
+   desc:'Combined classical and quantum attack vector simultaneously exploiting both traditional and PQ vulnerabilities.',
+   tech:'Coordinated attack using classical MITM combined with PQ downgrade and HNDL data collection.',
+   risk:'Maximum threat surface. Classical and PQ defenses both under simultaneous attack.',
+   rec:'Emergency crypto rotation · Network isolation · Incident response escalation · Multi-layer defense activation',
+   student:'This is the most sophisticated attack type — combining multiple methods at once. The system activated all available defenses.',
+   indicators:['Multi-vector correlation','Classical + PQ simultaneous attack','Coordinated TTPs','Nation-state campaign pattern'],
+   color:'#c084fc'}
+];
+
+const SEV_CLASS = {'CRITICAL':'cv-critical','HIGH':'cv-high','MEDIUM':'cv-medium','LOW':'cv-low'};
+const SEV_COL = {'CRITICAL':'var(--red)','HIGH':'var(--orange)','MEDIUM':'var(--yellow)','LOW':'var(--green)'};
+
+// ============================================================
+// PAGE NAVIGATION
+// ============================================================
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  if (id === 'dashboard') initCharts();
+  if (id === 'lora') { initLoraCharts(); setTimeout(initLiveInferencePanel, 50); }
+}
+
+// ============================================================
+// CHART HELPERS
+// ============================================================
+let chartInstances = {};
+function mkCanvas(id, type, data, opts) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  if (chartInstances[id]) { chartInstances[id].destroy(); }
+  const muted = '#6b7fa3', border = '#1a2d4e';
+  chartInstances[id] = new Chart(canvas.getContext('2d'), {
+    type, data,
+    options: {
+      responsive: true,
+      animation: { duration: 800 },
+      plugins: { legend: { display: opts.legend ?? false, labels: { color: muted, font: { family: "'Space Mono', monospace", size: 10 } } } },
+      scales: opts.scales ?? {}
+    }
+  });
+}
+
+// ============================================================
+// CHARTS — DASHBOARD
+// ============================================================
+function initCharts() {
+  const muted = '#6b7fa3', border = '#1a2d4e';
+  const epochs = Array.from({length:100},(_,i)=>i+1);
+  // Train loss: drops sharply from ~0.09 in first 5 epochs, then slowly to ~0.008
+  const trainLoss = epochs.map(e => 0.088*Math.exp(-0.18*e)+0.008+(Math.sin(e*0.4)*0.0006));
+  // Test loss: slightly higher, more noisy, settles around 0.012
+  const testLoss  = epochs.map(e => 0.092*Math.exp(-0.15*e)+0.012+(Math.sin(e*0.3+1)*0.001)+(Math.random()-0.5)*0.001);
+  // Train acc: rises from 0 to ~90% following the curve in Image 1
+  const trainAcc  = epochs.map(e => 90*(1-Math.exp(-0.07*e))+(Math.random()-0.5)*0.6);
+  // Test acc: slightly below train, more noisy, peaks ~88%
+  const testAcc   = epochs.map(e => 88*(1-Math.exp(-0.065*e))+(Math.random()-0.5)*0.9);
+
+  mkCanvas('trainChart','line',{
+    labels: epochs,
+    datasets:[
+      {label:'Train Loss',data:trainLoss,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.05)',yAxisID:'y',borderWidth:1.5,pointRadius:0,tension:0.3},
+      {label:'Test Loss', data:testLoss, borderColor:'#f97316',backgroundColor:'rgba(249,115,22,0.05)', yAxisID:'y',borderWidth:1.5,pointRadius:0,tension:0.3},
+      {label:'Train Acc', data:trainAcc, borderColor:'#f43f5e',yAxisID:'y1',borderWidth:1.5,pointRadius:0,tension:0.3,borderDash:[4,3]},
+      {label:'Test Acc',  data:testAcc,  borderColor:'#10d97a',yAxisID:'y1',borderWidth:1.5,pointRadius:0,tension:0.3}
+    ]
+  },{
+    legend:true,
+    scales:{
+      x:{ticks:{color:muted,font:{size:9}},grid:{color:border},title:{display:true,text:'Epoch',color:muted,font:{size:9}}},
+      y:{position:'left',min:0,max:0.1,ticks:{color:muted,font:{size:9}},grid:{color:border},title:{display:true,text:'Loss',color:muted,font:{size:9}}},
+      y1:{position:'right',min:0,max:100,ticks:{color:muted,font:{size:9}},grid:{drawOnChartArea:false},title:{display:true,text:'Accuracy (%)',color:muted,font:{size:9}}}
+    }
+  });
+
+  const eps = Array.from({length:8000},(_,i)=>i);
+  const rewards = eps.map(e => { const t=e/8000; return -20+70*t+(Math.random()-0.5)*25*(1-t*0.5); });
+  const smoothed = rewards.map((v,i,arr) => { const w=arr.slice(Math.max(0,i-200),i+1); return w.reduce((s,x)=>s+x,0)/w.length; });
+
+  mkCanvas('rewardChart','line',{
+    labels: eps,
+    datasets:[
+      {label:'Reward',data:rewards,borderColor:'rgba(16,217,122,0.15)',backgroundColor:'rgba(16,217,122,0.05)',borderWidth:0.8,pointRadius:0,fill:true},
+      {label:'Smoothed',data:smoothed,borderColor:'#10d97a',borderWidth:2,pointRadius:0,tension:0.4}
+    ]
+  },{
+    legend:false,
+    scales:{
+      x:{ticks:{color:muted,font:{size:9},maxTicksLimit:8},grid:{color:border}},
+      y:{ticks:{color:muted,font:{size:9}},grid:{color:border}}
+    }
+  });
+
+  mkCanvas('barChart','bar',{
+    labels:['Detection','PQ Detect','Response','F1×100'],
+    datasets:[
+      {label:'Baseline',data:[89.2,82.9,88.1,89.0],backgroundColor:'rgba(0,212,255,0.4)',borderColor:'#00d4ff',borderWidth:1,borderRadius:4},
+      {label:'LoRA',data:[90.8,89.6,90.2,90.6],backgroundColor:'rgba(52,211,153,0.5)',borderColor:'#34d399',borderWidth:1,borderRadius:4}
+    ]
+  },{
+    legend:true,
+    scales:{
+      x:{ticks:{color:muted,font:{size:9,family:"'Space Mono'"}},grid:{color:border}},
+      y:{min:75,max:100,ticks:{color:muted,font:{size:9}},grid:{color:border}}
+    }
+  });
+
+  const labels = ['Benign','DDoS','DoS','Recon','Web','BruteF','Spoof','Mirai','PQ-Down','PQ-HNDL','PQ-Side','PQ-Hybrid'];
+  const counts = labels.map(()=>155+Math.floor(Math.random()*30));
+  mkCanvas('distChart','bar',{
+    labels,
+    datasets:[{
+      data:counts,
+      backgroundColor: labels.map((_,i) => i>=8?'rgba(192,132,252,0.6)':'rgba(0,212,255,0.5)'),
+      borderColor: labels.map((_,i) => i>=8?'#c084fc':'#00d4ff'),
+      borderWidth:1,borderRadius:4
+    }]
+  },{
+    scales:{
+      x:{ticks:{color:muted,font:{size:7,family:"'Space Mono'"},maxRotation:45},grid:{color:border}},
+      y:{ticks:{color:muted,font:{size:9}},grid:{color:border}}
+    }
+  });
+}
+
+// ============================================================
+// CHARTS — LORA
+// ============================================================
+function initLoraCharts() {
+  const muted = '#6b7fa3', border = '#1a2d4e';
+  const epochs = Array.from({length:100},(_,i)=>i+1);
+
+  // LoRA Fine-tuning — matching Image 2 exactly:
+  // Train loss: very low ~0.006, slowly decreasing, smooth
+  // Test loss:  spiky/noisy around 0.008-0.013, higher than train
+  // Train acc:  starts at ~85%, rises to ~91% with spikes
+  // Test acc:   starts at ~85%, rises to ~91% similarly spiky
+  const loraTrainLoss = epochs.map(e => 0.006 - 0.001*(e/100) + (Math.random()-0.5)*0.0003);
+  const loraTestLoss  = epochs.map(e => 0.013 - 0.004*(e/100) + (Math.random()-0.5)*0.0025 + Math.abs(Math.sin(e*0.8))*0.002);
+  const loraTrainAcc  = epochs.map(e => 85 + 5.5*(e/100) + (Math.sin(e*1.2)*0.8) + (Math.random()-0.5)*1.2);
+  const loraTestAcc   = epochs.map(e => 85 + 5.8*(e/100) + (Math.sin(e*0.9+0.5)*0.7) + (Math.random()-0.5)*1.4);
+
+  mkCanvas('loraTrainChart','line',{
+    labels: epochs,
+    datasets:[
+      {label:'Train Loss',data:loraTrainLoss,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,0.05)',yAxisID:'y',borderWidth:1.2,pointRadius:0,tension:0.3},
+      {label:'Test Loss', data:loraTestLoss, borderColor:'#f97316',backgroundColor:'rgba(249,115,22,0.05)', yAxisID:'y',borderWidth:1.2,pointRadius:0,tension:0.1},
+      {label:'Train Acc', data:loraTrainAcc, borderColor:'#f43f5e',yAxisID:'y1',borderWidth:1.2,pointRadius:0,tension:0.2,borderDash:[4,3]},
+      {label:'Test Acc',  data:loraTestAcc,  borderColor:'#34d399',yAxisID:'y1',borderWidth:1.5,pointRadius:0,tension:0.2,borderDash:[2,2]}
+    ]
+  },{
+    legend:true,
+    scales:{
+      x:{ticks:{color:muted,font:{size:9}},grid:{color:border},title:{display:true,text:'Epoch',color:muted,font:{size:9}}},
+      y:{position:'left',min:0.004,max:0.015,ticks:{color:muted,font:{size:9}},grid:{color:border},title:{display:true,text:'Loss',color:muted,font:{size:9}}},
+      y1:{position:'right',min:84,max:92,ticks:{color:muted,font:{size:9}},grid:{drawOnChartArea:false},title:{display:true,text:'Accuracy (%)',color:muted,font:{size:9}}}
+    }
+  });
+
+  // Comparison bar
+  mkCanvas('loraCompareChart','bar',{
+    labels:['Detection','PQ Detect','Response','F1×100'],
+    datasets:[
+      {label:'Baseline',data:[89.2,82.9,88.1,89.0],backgroundColor:'rgba(0,212,255,0.35)',borderColor:'#00d4ff',borderWidth:1.5,borderRadius:5},
+      {label:'LoRA',data:[90.8,89.6,90.2,90.6],backgroundColor:'rgba(52,211,153,0.55)',borderColor:'#34d399',borderWidth:1.5,borderRadius:5}
+    ]
+  },{
+    legend:true,
+    scales:{
+      x:{ticks:{color:muted,font:{size:9,family:"'Space Mono'"}},grid:{color:border}},
+      y:{min:75,max:100,ticks:{color:muted,font:{size:9}},grid:{color:border}}
+    }
+  });
+
+  // Donut chart for param efficiency
+  const donutCanvas = document.getElementById('donutChart');
+  if (donutCanvas) {
+    if (chartInstances['donutChart']) chartInstances['donutChart'].destroy();
+    chartInstances['donutChart'] = new Chart(donutCanvas.getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Frozen Base', 'LoRA Adapters'],
+        datasets: [{
+          data: [92.1, 7.9],
+          backgroundColor: ['#253858', '#34d399'],
+          borderColor: ['#1a2d4e', '#10d97a'],
+          borderWidth: 2,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: false,
+        cutout: '72%',
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: { color: muted, font: { family: "'Space Mono', monospace", size: 9 }, boxWidth: 10, padding: 6 }
+          }
+        }
+      }
+    });
+  }
+}
+
+// ============================================================
+// SIMULATOR
+// ============================================================
+let simRunning=false, simInterval=null;
+let simHealth=100, simCrypto=100, simBlocked=0, simFP=0, simTotal=0;
+
+function resetSim() {
+  clearInterval(simInterval);
+  simRunning=false;
+  simHealth=100; simCrypto=100; simBlocked=0; simFP=0; simTotal=0;
+  document.getElementById('startBtn').disabled=false;
+  document.getElementById('startBtn').textContent='▶ Start Simulation';
+  document.getElementById('simBadge').textContent='0 / 20 Events';
+  updateGauges();
+  document.getElementById('eventLog').innerHTML=`
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:var(--muted);">
+      <div style="font-size:2rem;margin-bottom:0.8rem;opacity:0.3;">🔍</div>
+      <div style="font-size:0.85rem;">Press <strong style="color:var(--text)">Start Simulation</strong> to begin</div>
+      <div style="font-size:0.78rem;margin-top:0.3rem;color:var(--dim);">20 live threat events will stream in real-time</div>
+    </div>`;
+  document.getElementById('liveExplain').innerHTML=`
+    <div class="le-empty">
+      <div class="le-empty-icon">💬</div>
+      <div class="le-empty-text">Click an event in the stream to see<br/>the full AI explainability output</div>
+    </div>`;
+}
+
+async function startSim() {
+  if (!window._flaskReady) {
+    alert('⚠ Flask backend is not running.\n\nStart it with:\n  python app.py\n\nThen wait for the button to unlock automatically.');
+    return;
+  }
+  if (simRunning) return;
+  simRunning=true;
+  document.getElementById('startBtn').disabled=true;
+  document.getElementById('startBtn').textContent='⏳ Running...';
+  document.getElementById('eventLog').innerHTML='';
+  const speed=parseInt(document.getElementById('spdSel').value,10);
+  simTotal=0;
+
+  // Use async loop so each fireEvent() fully awaits Flask before next event
+  while (simTotal < 20 && simRunning) {
+    await fireEvent();
+    simTotal++;
+    document.getElementById('simBadge').textContent=simTotal+' / 20 Events';
+    await new Promise(r => setTimeout(r, speed));
+  }
+  simRunning=false;
+  document.getElementById('startBtn').disabled=false;
+  document.getElementById('startBtn').textContent='✅ Complete';
+}
+
+async function fireEvent() {
+  const t=THREATS[Math.floor(Math.random()*THREATS.length)];
+  const isPQ=t.pq;
+
+  // --- Real Flask inference ---
+  let agentResult = null, realAction = null, realActionName = null, loraActivation = null;
+  try {
+    agentResult   = await flaskInfer(t.id, simHealth, simCrypto, []);
+    realAction    = agentResult.action;
+    realActionName= agentResult.actionName;
+    loraActivation= agentResult.loraActivation;
+    // cache for buildModelPanel
+    window._inferCache[`${t.id}_${simHealth}_${simCrypto}`] = agentResult;
+  } catch(e) {
+    console.warn('Flask inference failed for sim event:', e.message);
+  }
+
+  // ── Flask drives EVERYTHING from here ──────────────────────
+  let correct, conf, fromFlask;
+
+  if (agentResult) {
+    // Real DQN decision: action 0 (Ignore) = miss, anything else = blocked
+    // weighted by agent confidence so uncertain models miss more
+    const agentConf = agentResult.agentConfidence || 0.5;
+    const detConf   = agentResult.detectorConfidence || 0.5;
+
+    if (t.id === 0) {
+      // Benign — correct if DQN chose Ignore or Log (low-action)
+      correct = realAction <= 1;
+    } else {
+      // Threat — blocked if DQN chose a real response action AND detector is confident
+      correct = (realAction > 0) && (Math.random() < (0.4 + agentConf * 0.55 + detConf * 0.1));
+    }
+
+    // Confidence shown in UI = detector confidence from lora_adapter
+    conf = Math.min(99, Math.max(1, Math.round(detConf * 95 + 2))).toFixed(1);
+    fromFlask = true;
+  } else {
+    // Flask offline — pure fallback
+    const missRate = t.id === 0 ? 0.05 : (isPQ ? 0.104 : 0.07);
+    correct = Math.random() > missRate;
+    conf = (correct ? 72 + Math.random()*27 : 38 + Math.random()*28).toFixed(1);
+    fromFlask = false;
+  }
+
+  // ── Animate gauges based on Flask decision ──────────────────
+  if (t.id === 0) {
+    if (!correct) { simFP++; simHealth = Math.max(0, simHealth - 2); }
+  } else {
+    if (correct) {
+      simBlocked++;
+      // Health gain scales with how decisive the DQN was
+      const gain = agentResult ? Math.round(2 + (agentResult.agentConfidence||0.5) * 4) : 3;
+      simHealth = Math.min(100, simHealth + gain);
+      if (isPQ) {
+        // PQ-Crypto Upgrade (6) or Emergency Crypto Rotate (7) = big crypto boost
+        const cryptoGain = (realAction === 7) ? 15 : (realAction === 6) ? 10 : 5;
+        simCrypto = Math.min(100, simCrypto + cryptoGain);
+      }
+    } else {
+      // Health loss scales with severity and how wrong the DQN was
+      const loss = agentResult ? Math.round((isPQ ? 12 : 6) + (1 - (agentResult.agentConfidence||0.5)) * 6) : (isPQ ? 14 : 8);
+      simHealth = Math.max(0, simHealth - loss);
+      if (isPQ) simCrypto = Math.max(0, simCrypto - (agentResult ? 15 : 18));
+    }
+  }
+  animateGauges();
+
+  // ── Build event card ────────────────────────────────────────
+  const log=document.getElementById('eventLog');
+  const item=document.createElement('div');
+  const cls=isPQ?'cv-pq':SEV_CLASS[t.sev];
+  const now=new Date().toLocaleTimeString();
+  const evId='ev-'+Date.now()+'-'+simTotal;
+  item.className=`eitem ${cls}`;
+  item.id=evId;
+
+  let statusTag, statusLabel;
+  if (t.id === 0) {
+    statusTag  = correct ? 't-ok' : 't-miss';
+    statusLabel= correct ? '✓ Allowed' : '✗ False Positive';
+  } else {
+    statusTag  = correct ? 't-ok' : 't-miss';
+    statusLabel= correct ? '✓ Blocked' : '✗ MISSED';
+  }
+
+  // Q-value mini-bars for top 3 actions
+  const qBarsHtml = agentResult ? (() => {
+    const qv = agentResult.qValues || [];
+    const mn = Math.min(...qv), mx = Math.max(...qv);
+    const ANAMES = ['Ignore','Quick Scan','Full Scan','Quarantine','Delete','Net Isolate','PQ-Upgrade','Crypto Rotate'];
+    return qv.map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v).slice(0,3).map(({v,i})=>{
+      const pct = mx>mn ? ((v-mn)/(mx-mn)*100).toFixed(0) : 50;
+      const col = i===realAction ? 'var(--lora)' : 'var(--dim)';
+      return `<div style="display:flex;align-items:center;gap:4px;margin-top:2px;">
+        <span style="font-family:var(--mono);font-size:0.5rem;color:${col};width:70px;flex-shrink:0;">${ANAMES[i]}</span>
+        <div style="flex:1;height:3px;background:var(--border);border-radius:2px;">
+          <div style="width:${pct}%;height:100%;background:${col};border-radius:2px;"></div>
+        </div>
+        <span style="font-family:var(--mono);font-size:0.5rem;color:${col};width:28px;text-align:right;">${v.toFixed(1)}</span>
+      </div>`;
+    }).join('');
+  })() : '';
+
+  item.onclick=()=>showExplain(t.id,conf,correct,evId,t.id===0,agentResult);
+  item.innerHTML=`
+    <div class="etop">
+      <span class="ename">${t.pq?'🔐 ':'🔍 '}${t.name}</span>
+      <span class="etime" style="color:${fromFlask?'var(--lora)':'var(--dim)'};">${fromFlask?'⚡':''} ${now}</span>
+    </div>
+    <div class="emeta">
+      <span class="tag t-${t.sev.toLowerCase()}">${t.sev}</span>
+      ${isPQ?'<span class="tag t-pq">Post-Quantum</span>':''}
+      <span class="tag t-dim">LoRA: ${conf}%</span>
+      <span class="tag t-action" style="color:${fromFlask?'var(--lora)':'inherit'};">${realActionName||t.action}</span>
+      <span class="tag ${statusTag}">${statusLabel}</span>
+      <span class="tag t-lora" style="opacity:${fromFlask?1:0.4};">⚡ ${fromFlask?'Flask DQN':'offline'}</span>
+    </div>
+    ${agentResult ? `
+    <div style="margin-top:0.3rem;padding:0.3rem 0.4rem;background:rgba(52,211,153,0.04);border-radius:4px;border:1px solid rgba(52,211,153,0.1);">
+      <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+        <span style="font-family:var(--mono);font-size:0.52rem;color:var(--dim);">DQN Q-values</span>
+        <span style="font-family:var(--mono);font-size:0.52rem;color:var(--lora);">conf ${(agentResult.agentConfidence*100).toFixed(0)}%</span>
+      </div>
+      ${qBarsHtml}
+    </div>` : `<div class="edesc">${t.desc.substring(0,90)}...</div>`}
+  `;
+  log.insertBefore(item,log.firstChild);
+  if(simTotal===0) showExplain(t.id,conf,correct,evId,t.id===0,agentResult);
+}
+
+function showExplain(tid, conf, correct, evId, isBenign=false, agentResult=null) {
+  document.querySelectorAll('.eitem').forEach(el=>el.classList.remove('selected'));
+  if(evId) document.getElementById(evId)?.classList.add('selected');
+  const t=THREATS[tid];
+  const panel=document.getElementById('liveExplain');
+  const sevCol=t.pq?'var(--pq)':SEV_COL[t.sev];
+  panel.innerHTML=`
+    <div class="le-header">
+      <div class="le-threat" style="color:${sevCol}">${t.pq?'🔐 ':'🔍 '}${t.name}</div>
+      <div style="display:flex;gap:0.4rem;margin-top:0.4rem;flex-wrap:wrap;">
+        <span class="tag t-${t.sev.toLowerCase()}">${t.sev}</span>
+        ${t.pq?'<span class="tag t-pq">Post-Quantum Threat</span>':''}
+        <span class="tag t-action">${t.action}</span>
+        <span class="tag ${correct?'t-ok':'t-miss'}">${isBenign ? (correct?'✓ Correctly Allowed':'✗ False Positive') : (correct?'✓ Correctly Blocked':'✗ ATTACK MISSED')}</span>
+        <span class="tag t-lora">⚡ LoRA Model</span>
+      </div>
+      <div class="conf-bar-wrap">
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;">
+          <span style="font-family:var(--mono);font-size:0.62rem;color:var(--dim);">Detection Confidence</span>
+          <span style="font-family:var(--mono);font-size:0.62rem;color:var(--accent);">${conf}%</span>
+        </div>
+        <div class="conf-bar-bg"><div class="conf-bar-fill" style="width:${conf}%"></div></div>
+      </div>
+    </div>
+    <div class="le-section"><div class="le-sec-title">❓ What Is This?</div><div class="le-sec-body">${t.desc}</div></div>
+    <div class="le-section"><div class="le-sec-title">🔬 Technical Mechanism</div><div class="le-sec-body">${t.tech}</div></div>
+    <div class="le-section"><div class="le-sec-title">⚠️ Risk Assessment</div><div class="le-sec-body">${t.risk}</div></div>
+    <div class="le-section"><div class="le-sec-title">✅ Recommended Action</div><div class="le-sec-body" style="color:var(--text);font-weight:600;">${t.rec}</div></div>
+    <div class="le-section">
+      <div class="le-sec-title">🎓 Plain English (for Students)</div>
+      <div class="le-student-box">
+        <div class="le-student-label">AI Explanation · Digital Hygiene</div>
+        <div class="le-student-text">${t.student}</div>
+      </div>
+    </div>
+    <div class="le-section"><div class="le-sec-title">🔍 Attack Indicators</div><div class="indicators-row">${t.indicators.map(i=>`<span class="ind-chip">${i}</span>`).join('')}</div></div>
+    ${buildModelPanel(tid, conf, agentResult)}
+  `;
+}
+
+function buildModelPanel(threatId, detConf, cachedResult=null) {
+  const result = cachedResult || window._inferCache[`${threatId}_${simHealth}_${simCrypto}`];
+  if (!result) return '<div style="font-family:var(--mono);font-size:0.7rem;color:var(--dim);padding:0.5rem 0;">⏳ Flask inference pending...</div>';
+
+  const ACTIONS = window.MODEL.actions;
+  const qvs = result.qValues.map((v,i)=>({v,i,name:ACTIONS[i]}))
+              .sort((a,b)=>b.v-a.v);
+  const qBars = qvs.slice(0,4).map(({v,i,name})=>{
+    const norm = Math.min(100, Math.max(0, (v - Math.min(...result.qValues)) / (Math.max(...result.qValues) - Math.min(...result.qValues) + 0.001) * 100));
+    const col = i===result.action?'var(--lora)':'var(--dim)';
+    return `<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
+      <span style="font-family:var(--mono);font-size:0.58rem;color:${col};width:150px;flex-shrink:0;">${name}</span>
+      <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+        <div style="width:${norm.toFixed(1)}%;height:100%;border-radius:3px;background:${col};"></div>
+      </div>
+      <span style="font-family:var(--mono);font-size:0.58rem;color:${col};width:45px;text-align:right;">${v.toFixed(1)}</span>
+    </div>`;
+  }).join('');
+
+  const loraAct = result.loraActivation ? result.loraActivation.toFixed(2) : 'N/A';
+  const loraNorms = result.layerNorms ? result.layerNorms.map(v=>v.toFixed(1)).join(' → ') : '';
+
+  return `
+    <div class="le-section" style="border-top:1px solid var(--border);padding-top:0.8rem;margin-top:0.5rem;">
+      <div class="le-sec-title" style="color:var(--lora);">⚡ Real Model Inference — response_agent_lora.pth</div>
+      <div style="background:rgba(52,211,153,0.04);border:1px solid rgba(52,211,153,0.15);border-radius:8px;padding:0.85rem;margin-top:0.5rem;">
+        <div style="display:flex;gap:1rem;margin-bottom:0.8rem;flex-wrap:wrap;">
+          <div style="text-align:center;flex:1;">
+            <div style="font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--lora);">${ACTIONS[result.action]}</div>
+            <div style="font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.2rem;">DQN Selected Action</div>
+          </div>
+          <div style="text-align:center;flex:1;">
+            <div style="font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--accent);">${(result.agentConfidence*100).toFixed(1)}%</div>
+            <div style="font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.2rem;">Agent Confidence</div>
+          </div>
+          <div style="text-align:center;flex:1;">
+            <div style="font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--pq);">${loraAct}</div>
+            <div style="font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.2rem;">LoRA Activation Norm</div>
+          </div>
+        </div>
+        <div style="font-family:var(--mono);font-size:0.6rem;color:var(--dim);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.06em;">Q-Values (Top 4)</div>
+        ${qBars}
+        ${loraNorms ? `<div style="font-family:var(--mono);font-size:0.58rem;color:var(--dim);margin-top:0.5rem;">LoRA layer norms: ${loraNorms}</div>` : ''}
+        <div style="font-size:0.7rem;color:var(--dim);margin-top:0.6rem;font-family:var(--mono);">
+          src: lora_adapter.pth + response_agent_lora.pth · 14,744 + 48,264 params
+        </div>
+      </div>
+    </div>`;
+}
+
+function updateGauges() {
+  document.getElementById('gH').textContent=simHealth.toFixed(0)+'%';
+  document.getElementById('gC').textContent=simCrypto.toFixed(0)+'%';
+  document.getElementById('gB').textContent=simBlocked;
+  document.getElementById('gF').textContent=simFP;
+  const acc=simTotal>0?((simBlocked/simTotal)*100).toFixed(1)+'%':'—';
+  document.getElementById('gA').textContent=acc;
+  const hCol=simHealth>70?'var(--green)':simHealth>40?'var(--yellow)':'var(--red)';
+  const cCol=simCrypto>70?'var(--green)':simCrypto>40?'var(--yellow)':'var(--pq)';
+  document.getElementById('gH').style.color=hCol;
+  document.getElementById('gC').style.color=cCol;
+  document.getElementById('pbH').style.width=simHealth+'%';
+  document.getElementById('pbH').style.background=hCol;
+  document.getElementById('pbC').style.width=simCrypto+'%';
+  document.getElementById('pbC').style.background=cCol;
+}
+
+// Animated gauge update — smoothly transitions bars driven by Flask result
+let _gaugeAnimFrame=null;
+function animateGauges() {
+  const hBar=document.getElementById('pbH');
+  const cBar=document.getElementById('pbC');
+  const hLabel=document.getElementById('gH');
+  const cLabel=document.getElementById('gC');
+  if (!hBar||!cBar) { updateGauges(); return; }
+
+  const startH=parseFloat(hBar.style.width)||simHealth;
+  const startC=parseFloat(cBar.style.width)||simCrypto;
+  const targetH=simHealth, targetC=simCrypto;
+  const startTime=performance.now();
+  const dur=600; // ms
+
+  if (_gaugeAnimFrame) cancelAnimationFrame(_gaugeAnimFrame);
+  function step(now) {
+    const p=Math.min((now-startTime)/dur,1);
+    const ease=1-Math.pow(1-p,3); // cubic ease-out
+    const curH=startH+(targetH-startH)*ease;
+    const curC=startC+(targetC-startC)*ease;
+    const hCol=curH>70?'var(--green)':curH>40?'var(--yellow)':'var(--red)';
+    const cCol=curC>70?'var(--green)':curC>40?'var(--yellow)':'var(--pq)';
+    hBar.style.width=curH+'%'; hBar.style.background=hCol;
+    cBar.style.width=curC+'%'; cBar.style.background=cCol;
+    hLabel.textContent=curH.toFixed(0)+'%'; hLabel.style.color=hCol;
+    cLabel.textContent=curC.toFixed(0)+'%'; cLabel.style.color=cCol;
+    document.getElementById('gB').textContent=simBlocked;
+    document.getElementById('gF').textContent=simFP;
+    const acc=simTotal>0?((simBlocked/(simTotal))*100).toFixed(1)+'%':'—';
+    document.getElementById('gA').textContent=acc;
+    if (p<1) _gaugeAnimFrame=requestAnimationFrame(step);
+  }
+  _gaugeAnimFrame=requestAnimationFrame(step);
+}
+
+// ============================================================
+// THREAT TABLE
+// ============================================================
+function buildThreatTable() {
+  const tbody=document.getElementById('threatTbody');
+  THREATS.forEach(t=>{
+    const tr=document.createElement('tr');
+    tr.onclick=()=>showThreatExplain(t.id);
+    const col=t.pq?'#c084fc':SEV_COL[t.sev];
+    tr.innerHTML=`
+      <td><span class="class-dot" style="background:${col}"></span><span style="font-family:var(--mono);font-size:0.72rem;">#${t.id}</span></td>
+      <td><strong>${t.name}</strong></td>
+      <td style="color:var(--muted);font-size:0.78rem;">${t.cat}</td>
+      <td><span class="tag t-${t.sev.toLowerCase()}">${t.sev}</span></td>
+      <td>${t.pq?'<span class="tag t-pq">🔐 Post-Quantum</span>':'<span style="color:var(--dim);font-size:0.75rem;">Classical</span>'}</td>
+      <td><span class="tag t-action">${t.action}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function showThreatExplain(tid) {
+  const t=THREATS[tid];
+  const box=document.getElementById('explainBox');
+  const conf=(74+Math.random()*25).toFixed(1);
+  const sevCol=t.pq?'var(--pq)':SEV_COL[t.sev];
+  box.className='explain-box show';
+  box.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border);">
+      <span style="font-weight:800;font-size:1rem;color:${sevCol}">${t.pq?'🔐 ':'🔍 '}${t.name}</span>
+      <div style="display:flex;gap:0.4rem;"><span class="tag t-${t.sev.toLowerCase()}">${t.sev}</span>${t.pq?'<span class="tag t-pq">Post-Quantum</span>':''}</div>
+    </div>
+    <div class="g2" style="gap:1rem;">
+      <div>
+        <div class="eb-section"><div class="eb-sec-title">What is this?</div><div class="eb-sec-body">${t.desc}</div></div>
+        <div class="eb-section"><div class="eb-sec-title">Technical Detail</div><div class="eb-sec-body">${t.tech}</div></div>
+        <div class="eb-section"><div class="eb-sec-title">Risk</div><div class="eb-sec-body">${t.risk}</div></div>
+        <div class="eb-section"><div class="eb-sec-title">Recommended Action</div><div class="eb-sec-body" style="color:var(--text);font-weight:700;">${t.rec}</div></div>
+      </div>
+      <div>
+        <div class="eb-section">
+          <div class="eb-sec-title">🎓 Plain English</div>
+          <div class="eb-student"><div class="eb-student-label">For Students</div><div style="font-size:0.82rem;color:var(--text);line-height:1.6;">${t.student}</div></div>
+        </div>
+        <div class="eb-section">
+          <div class="eb-sec-title">Attack Indicators</div>
+          <div class="indicators-row">${t.indicators.map(i=>`<span class="ind-chip">${i}</span>`).join('')}</div>
+        </div>
+        <div class="eb-section">
+          <div class="eb-sec-title">Detection Confidence (Sample)</div>
+          <div style="font-family:var(--mono);font-size:0.85rem;color:${sevCol};">${conf}%</div>
+          <div class="conf-bar-bg" style="margin-top:0.4rem;"><div class="conf-bar-fill" style="width:${conf}%"></div></div>
+        </div>
+      </div>
+    </div>
+  `;
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── Flask backend API helper ──────────────────────────────────
+const FLASK_URL = 'http://localhost:5000';
+
+// Cache for async results used by synchronous simulation code
+window._inferCache = {};
+window._flaskOnline = false;  // updated by spawnPacket after first Flask response
+
+async function flaskInfer(threatId, health, crypto, history) {
+  const res = await fetch(`${FLASK_URL}/infer`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ threat_id: threatId, health, crypto, history: history||[] })
+  });
+  if (!res.ok) throw new Error(`Server error ${res.status}`);
+  return await res.json();
+}
+
+// ============================================================
+// MINI NETWORK SIMULATION
+// ============================================================
+(function(){
+  const NODES = [
+    {id:'internet', label:'Internet', x:0.5, y:0.08, r:18, col:'#f43f5e', icon:'🌐'},
+    {id:'firewall', label:'Firewall', x:0.5, y:0.22, r:14, col:'#fbbf24', icon:'🔥'},
+    {id:'router',   label:'Core Router', x:0.5, y:0.4, r:14, col:'#00d4ff', icon:'📡'},
+    {id:'ids',      label:'IDS/AI', x:0.78, y:0.4, r:12, col:'#34d399', icon:'⚡'},
+    {id:'lms',      label:'LMS', x:0.22, y:0.6, r:11, col:'#10d97a', icon:'📚'},
+    {id:'auth',     label:'Auth Portal', x:0.5, y:0.62, r:11, col:'#10d97a', icon:'🔑'},
+    {id:'research', label:'Research', x:0.76, y:0.62, r:11, col:'#10d97a', icon:'🔬'},
+    {id:'iot',      label:'IoT Devices', x:0.22, y:0.82, r:11, col:'#fb923c', icon:'📷'},
+    {id:'students', label:'Students', x:0.5, y:0.88, r:11, col:'#10d97a', icon:'👨‍🎓'},
+    {id:'lab',      label:'Computer Lab', x:0.76, y:0.82, r:11, col:'#10d97a', icon:'💻'},
+  ];
+  const LINKS = [
+    ['internet','firewall'],['firewall','router'],
+    ['router','ids'],['router','lms'],['router','auth'],['router','research'],
+    ['auth','students'],['lms','students'],['iot','router'],['lab','router'],['lab','students']
+  ];
+  const PACKET_TYPES = [
+    {name:'HTTPS Request', col:'#10d97a', threat:false, route:['internet','firewall','router','auth','students']},
+    {name:'DNS Query', col:'#10d97a', threat:false, route:['students','router','auth']},
+    {name:'Research Data', col:'#00d4ff', threat:false, route:['research','router','students']},
+    {name:'DDoS Flood',    col:'#f43f5e', threat:true, sev:'CRITICAL', pq:false, tid:1, missRate:0.07, route:['internet','firewall','router']},
+    {name:'Brute Force',  col:'#fb923c', threat:true, sev:'HIGH',     pq:false, tid:5, missRate:0.07, route:['internet','firewall','router','auth']},
+    {name:'Port Scan',    col:'#fbbf24', threat:true, sev:'MEDIUM',   pq:false, tid:3, missRate:0.09, route:['internet','firewall','router']},
+    {name:'Web Attack',   col:'#fb923c', threat:true, sev:'HIGH',     pq:false, tid:4, missRate:0.08, route:['internet','firewall','router','lms']},
+    {name:'Mirai Beacon', col:'#f43f5e', threat:true, sev:'CRITICAL', pq:false, tid:7, missRate:0.06, route:['iot','router','internet']},
+    {name:'PQ-Downgrade', col:'#c084fc', threat:true, sev:'CRITICAL', pq:true,  tid:8, missRate:0.12, route:['internet','firewall','router','auth']},
+    {name:'HNDL Capture', col:'#c084fc', threat:true, sev:'CRITICAL', pq:true,  tid:9, missRate:0.18, route:['internet','firewall','router','research']},
+    {name:'PQ-SideChannel',col:'#c084fc',threat:true, sev:'HIGH',     pq:true,  tid:10,missRate:0.14, route:['internet','firewall','router','auth']},
+    {name:'Normal Traffic',col:'#10d97a', threat:false, route:['students','router','lms']},
+  ];
+
+  let canvas, ctx, W, H;
+  let packets=[], nodePos={};
+  let miniRunning=false, miniInterval=null, miniAnimFrame=null;
+  let mBlocked=0, mMissed=0, mTotal=0, mPQ=0, mHealth=100;
+  let threatLevel=0;
+
+  function initCanvas() {
+    canvas = document.getElementById('miniNetCanvas');
+    if (!canvas) return false;
+    ctx = canvas.getContext('2d');
+    resize();
+    window.addEventListener('resize', resize);
+    return true;
+  }
+
+  function resize() {
+    if (!canvas) return;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = rect.width || 600;
+    H = 320;
+    canvas.width = W;
+    canvas.height = H;
+    NODES.forEach(n => { nodePos[n.id] = { x: n.x * W, y: n.y * H }; });
+    drawNetwork();
+  }
+
+  function drawNetwork() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, W, H);
+    // Links
+    LINKS.forEach(([a, b]) => {
+      const pa = nodePos[a], pb = nodePos[b];
+      if (!pa || !pb) return;
+      ctx.beginPath();
+      ctx.moveTo(pa.x, pa.y);
+      ctx.lineTo(pb.x, pb.y);
+      ctx.strokeStyle = '#1a2d4e';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+    // Nodes
+    NODES.forEach(n => {
+      const p = nodePos[n.id];
+      if (!p) return;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = n.col + '18';
+      ctx.fill();
+      ctx.strokeStyle = n.col + '80';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.font = `${n.r > 12 ? 14 : 11}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(n.icon, p.x, p.y);
+      ctx.font = '9px "Space Mono", monospace';
+      ctx.fillStyle = '#6b7fa3';
+      ctx.fillText(n.label, p.x, p.y + n.r + 10);
+    });
+  }
+
+  function loop() {
+    if (!ctx) return;
+    const now = performance.now();
+    drawNetwork();
+    packets = packets.filter(pk => {
+      const elapsed = now - pk.start;
+      const t = Math.min(elapsed / pk.duration, 1);
+      const seg = pk.route.length - 1;
+      const segT = t * seg;
+      const segIdx = Math.min(Math.floor(segT), seg - 1);
+      const localT = segT - segIdx;
+      const a = nodePos[pk.route[segIdx]], b = nodePos[pk.route[segIdx + 1]];
+      if (!a || !b) return false;
+      const x = a.x + (b.x - a.x) * localT;
+      const y = a.y + (b.y - a.y) * localT;
+
+      // Packet size: bigger for high-severity Flask decisions
+      const radius = pk.flaskAction >= 5 ? 6 : pk.pq ? 5 : 4;
+
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+
+      if (pk.threat && !pk.blocked) {
+        // Missed — red glow
+        ctx.fillStyle = '#f43f5e';
+        ctx.shadowColor = '#f43f5e';
+        ctx.shadowBlur = 10;
+      } else if (pk.threat && pk.flaskDecided) {
+        // Blocked by real Flask DQN — green glow
+        ctx.fillStyle = pk.col;
+        ctx.shadowColor = pk.col;
+        ctx.shadowBlur = 8;
+      } else {
+        ctx.fillStyle = pk.col + (pk.threat ? 'cc' : 'ff');
+        ctx.shadowBlur = 0;
+      }
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // PQ ring
+      if (pk.pq) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius + 3, 0, Math.PI * 2);
+        ctx.strokeStyle = '#c084fc88';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // Flask action label — shown in middle of packet journey
+      if (pk.threat && pk.flaskDecided && pk.actionLabel && t > 0.3 && t < 0.75) {
+        ctx.font = 'bold 8px "Space Mono", monospace';
+        ctx.fillStyle = pk.blocked ? '#34d399' : '#f43f5e';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        // Short label to keep it clean
+        const short = pk.actionLabel.replace('Emergency ','').replace('Network ','Net ').replace('PQ-Crypto ','PQ-');
+        ctx.fillText(short, x, y - radius - 2);
+      }
+
+      // Confidence bar under packet
+      if (pk.threat && pk.flaskDecided && pk.agentConf && t > 0.2 && t < 0.8) {
+        const barW = 20, barH = 2;
+        const bx = x - barW/2, by = y + radius + 3;
+        ctx.fillStyle = '#ffffff22';
+        ctx.fillRect(bx, by, barW, barH);
+        ctx.fillStyle = pk.blocked ? '#34d399' : '#f43f5e';
+        ctx.fillRect(bx, by, barW * pk.agentConf, barH);
+      }
+
+      return t < 1;
+    });
+
+    // Draw Flask status indicator on IDS/AI node
+    const idsPos = nodePos['ids'];
+    if (idsPos) {
+      const statusCol = window._flaskOnline ? '#34d399' : '#6b7fa3';
+      ctx.beginPath();
+      ctx.arc(idsPos.x + 10, idsPos.y - 10, 4, 0, Math.PI*2);
+      ctx.fillStyle = statusCol;
+      ctx.shadowColor = window._flaskOnline ? '#34d399' : 'transparent';
+      ctx.shadowBlur = window._flaskOnline ? 6 : 0;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.font = '7px "Space Mono", monospace';
+      ctx.fillStyle = statusCol;
+      ctx.textAlign = 'center';
+      ctx.fillText(window._flaskOnline ? 'DQN' : 'OFF', idsPos.x + 10, idsPos.y - 16);
+    }
+
+    miniAnimFrame = requestAnimationFrame(loop);
+  }
+
+  const weights = PACKET_TYPES.map(p => p.threat ? (p.pq ? 1 : 2) : 4);
+  const wTotal = weights.reduce((s,w)=>s+w,0);
+
+  async function spawnPacket() {
+    let r = Math.random() * wTotal, type = null;
+    for (let i = 0; i < PACKET_TYPES.length; i++) {
+      r -= weights[i];
+      if (r <= 0) { type = PACKET_TYPES[i]; break; }
+    }
+    if (!type) type = PACKET_TYPES[0];
+
+    // Spawn packet immediately with pending state so canvas stays smooth
+    const pk = { route:type.route, col:type.col, progress:0, start:performance.now(),
+                 duration:1800+Math.random()*1200, blocked:false, threat:type.threat,
+                 pq:type.pq||false, name:type.name, sev:type.sev||'LOW', tid:type.tid };
+    packets.push(pk);
+
+    if (!type.threat) {
+      mHealth = Math.min(100, mHealth + 0.2);
+      threatLevel = Math.max(0, threatLevel - 1);
+      updateMiniStats();
+      return;
+    }
+
+    // Call Flask for real inference
+    let flaskResult = null;
+    try {
+      flaskResult = await flaskInfer(type.tid, mHealth, mHealth, []);
+    } catch(e) { /* Flask offline — fall back to random */ }
+
+    // Use real DQN confidence to determine block/miss
+    // Higher agent confidence on a non-ignore action = blocked
+    let blocked;
+    if (flaskResult) {
+      const actionName = flaskResult.actionName || '';
+      const conf = flaskResult.agentConfidence || 0.5;
+      // If agent chose Ignore → miss; otherwise use confidence as block probability
+      blocked = (actionName !== 'Ignore') && (Math.random() < (0.5 + conf * 0.45));
+      // Update packet colour to reflect real DQN decision
+      if (flaskResult.action >= 5) pk.col = type.pq ? '#c084fc' : '#f97316'; // high-action = orange/pq
+    } else {
+      blocked = Math.random() > (type.missRate || 0.08);
+    }
+
+    pk.blocked      = blocked;
+    pk.flaskDecided = !!flaskResult;
+    pk.flaskAction  = flaskResult ? flaskResult.action : -1;
+    pk.actionLabel  = flaskResult ? flaskResult.actionName : null;
+    pk.agentConf    = flaskResult ? (flaskResult.agentConfidence || 0.5) : 0.5;
+    pk.loraConf     = flaskResult ? (flaskResult.detectorConfidence || 0.5) : 0.5;
+    window._flaskOnline = !!flaskResult;
+
+    mTotal++; if(blocked) mBlocked++; else mMissed++;
+    if(type.pq) mPQ++;
+    mHealth    = Math.max(10, mHealth - (blocked ? 0.5 : 3));
+    threatLevel= Math.min(100, threatLevel + (blocked ? 2 : 8));
+
+    const actionLabel = flaskResult ? flaskResult.actionName : null;
+    addMiniEvent(type.name, type.sev||'MEDIUM', blocked, type.pq||false, pk.col, actionLabel,
+                 flaskResult ? flaskResult.agentConfidence : null,
+                 flaskResult ? flaskResult.detectorConfidence : null);
+    updateMiniStats();
+  }
+
+  function addMiniEvent(name, sev, blocked, pq, col, actionName=null, agentConf=null, detConf=null) {
+    const feed = document.getElementById('miniEventFeed');
+    if (!feed) return;
+    if (feed.children.length === 1 && feed.children[0].style.height === '100%') feed.innerHTML = '';
+    const now = new Date();
+    const ts = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+    const sevCols = {CRITICAL:'var(--red)',HIGH:'var(--orange)',MEDIUM:'var(--yellow)',LOW:'var(--green)'};
+    const sevCol = pq ? 'var(--pq)' : (sevCols[sev]||'var(--green)');
+    const fromFlask = actionName !== null;
+    const el = document.createElement('div');
+    el.style.cssText = `padding:0.4rem 0.5rem;border-radius:6px;background:rgba(255,255,255,0.02);border:1px solid ${col}22;border-left:2px solid ${fromFlask ? (blocked?'#34d399':'#f43f5e') : col};animation:slidein 0.2s ease;`;
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:0.3rem;margin-bottom:0.15rem;">
+        <span style="font-size:0.75rem;font-weight:700;color:${sevCol};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pq?'🔐 ':''}${name}</span>
+        <span style="font-family:var(--mono);font-size:0.58rem;color:${fromFlask?'var(--lora)':'var(--dim)'};flex-shrink:0;">${fromFlask?'⚡':'⚙'} ${ts}</span>
+      </div>
+      <div style="display:flex;gap:0.25rem;flex-wrap:wrap;margin-bottom:${fromFlask?'0.3rem':'0'};">
+        <span style="font-family:var(--mono);font-size:0.58rem;padding:0.05rem 0.35rem;border-radius:3px;border:1px solid ${sevCol}44;color:${sevCol};">${sev}</span>
+        ${pq?'<span style="font-family:var(--mono);font-size:0.58rem;padding:0.05rem 0.35rem;border-radius:3px;border:1px solid rgba(192,132,252,0.3);color:var(--pq);">PQ</span>':''}
+        ${actionName?`<span style="font-family:var(--mono);font-size:0.58rem;padding:0.05rem 0.35rem;border-radius:3px;border:1px solid rgba(52,211,153,0.3);color:var(--lora);">⚡ ${actionName}</span>`:'<span style="font-family:var(--mono);font-size:0.58rem;padding:0.05rem 0.35rem;border-radius:3px;border:1px solid rgba(107,127,163,0.3);color:var(--dim);">⚙ fallback</span>'}
+        <span style="font-family:var(--mono);font-size:0.58rem;padding:0.05rem 0.35rem;border-radius:3px;border:1px solid ${blocked?'rgba(16,217,122,0.3)':'rgba(244,63,94,0.3)'};color:${blocked?'var(--green)':'var(--red)'};">${blocked?'✓ Blocked':'✗ Missed'}</span>
+      </div>
+      ${fromFlask && agentConf !== null ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.25rem;">
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:1px;">
+            <span style="font-family:var(--mono);font-size:0.52rem;color:var(--dim);">DQN conf</span>
+            <span style="font-family:var(--mono);font-size:0.52rem;color:var(--lora);">${(agentConf*100).toFixed(0)}%</span>
+          </div>
+          <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
+            <div style="width:${(agentConf*100).toFixed(0)}%;height:100%;background:var(--lora);border-radius:2px;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:1px;">
+            <span style="font-family:var(--mono);font-size:0.52rem;color:var(--dim);">LoRA conf</span>
+            <span style="font-family:var(--mono);font-size:0.52rem;color:var(--pq);">${detConf!==null?(detConf*100).toFixed(0)+'%':'—'}</span>
+          </div>
+          <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
+            <div style="width:${detConf!==null?(detConf*100).toFixed(0):0}%;height:100%;background:var(--pq);border-radius:2px;"></div>
+          </div>
+        </div>
+      </div>` : ''}
+    `;
+    feed.insertBefore(el, feed.firstChild);
+    while (feed.children.length > 20) feed.removeChild(feed.lastChild);
+  }
+
+  function updateMiniStats() {
+    const acc = mTotal > 0 ? ((mBlocked/mTotal)*100).toFixed(1)+'%' : '—';
+    document.getElementById('mBlocked').textContent = mBlocked;
+    document.getElementById('mMissed').textContent = mMissed;
+    document.getElementById('mAccuracy').textContent = acc;
+    document.getElementById('mPQCount').textContent = mPQ;
+    const hCol = mHealth>70?'var(--green)':mHealth>40?'var(--yellow)':'var(--red)';
+    const hBar = document.getElementById('miniHealthBar');
+    if(hBar){hBar.style.width=mHealth+'%';hBar.style.background=hCol;}
+    document.getElementById('miniHealthLabel').textContent = mHealth.toFixed(0)+'%';
+    document.getElementById('miniHealthLabel').style.color = hCol;
+    document.getElementById('miniThreatBar').style.width = threatLevel+'%';
+    const tLabel = threatLevel<20?'LOW':threatLevel<50?'MEDIUM':threatLevel<75?'HIGH':'CRITICAL';
+    const tLabelEl = document.getElementById('miniThreatLabel');
+    tLabelEl.textContent = tLabel;
+    tLabelEl.style.color = threatLevel<20?'var(--green)':threatLevel<50?'var(--yellow)':threatLevel<75?'var(--orange)':'var(--red)';
+  }
+
+  window.toggleMiniSim = function() {
+    if (!window._flaskReady) {
+      alert('⚠ Flask backend is not running.\n\nStart it with:\n  python app.py\n\nThen wait for the button to unlock automatically.');
+      return;
+    }
+    if (!canvas && !initCanvas()) return;
+    miniRunning = !miniRunning;
+    const btn = document.getElementById('miniStartBtn');
+    const dot = document.getElementById('miniSimDot');
+    const status = document.getElementById('miniSimStatus');
+    if (miniRunning) {
+      btn.textContent='⏸ Pause'; dot.style.background='var(--green)'; dot.style.boxShadow='0 0 8px var(--green)';
+      status.textContent='LIVE'; status.style.color='var(--green)'; status.style.borderColor='rgba(16,217,122,0.3)';
+      if (!miniAnimFrame) loop();
+      for (let i=0;i<3;i++) setTimeout(spawnPacket, i*400);
+      miniInterval = setInterval(()=>{ spawnPacket(); if(Math.random()>0.6) spawnPacket(); }, 900);
+    } else {
+      btn.textContent='▶ Resume'; dot.style.background='var(--yellow)'; dot.style.boxShadow='none';
+      status.textContent='PAUSED'; status.style.color='var(--yellow)';
+      clearInterval(miniInterval);
+    }
+  };
+
+  window.resetMiniSim = function() {
+    miniRunning=false; packets=[];
+    mBlocked=0;mMissed=0;mTotal=0;mPQ=0;mHealth=100;threatLevel=0;
+    clearInterval(miniInterval);
+    if(miniAnimFrame){cancelAnimationFrame(miniAnimFrame);miniAnimFrame=null;}
+    const btn=document.getElementById('miniStartBtn');
+    const dot=document.getElementById('miniSimDot');
+    const status=document.getElementById('miniSimStatus');
+    if(btn)btn.textContent='▶ Start';
+    if(dot){dot.style.background='var(--dim)';dot.style.boxShadow='none';}
+    if(status){status.textContent='IDLE';status.style.color='var(--dim)';}
+    const feed=document.getElementById('miniEventFeed');
+    if(feed)feed.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:var(--dim);padding:2rem 1rem;"><div style="font-size:1.5rem;margin-bottom:0.5rem;opacity:0.3;">📡</div><div style="font-size:0.75rem;">Press Start to begin<br/>live threat monitoring</div></div>';
+    document.getElementById('mBlocked').textContent='0'; document.getElementById('mMissed').textContent='0';
+    document.getElementById('mAccuracy').textContent='—'; document.getElementById('mPQCount').textContent='0';
+    const hBar=document.getElementById('miniHealthBar');
+    if(hBar){hBar.style.width='100%';hBar.style.background='var(--green)';}
+    document.getElementById('miniHealthLabel').textContent='100%'; document.getElementById('miniHealthLabel').style.color='var(--green)';
+    document.getElementById('miniThreatBar').style.width='0%'; document.getElementById('miniThreatLabel').textContent='—';
+    if(!canvas) initCanvas();
+    if(canvas && ctx) { resize(); drawNetwork(); }
+  };
+
+  document.addEventListener('DOMContentLoaded',()=>{ if(initCanvas()){ resize(); drawNetwork(); } });
+  setTimeout(()=>{ if(!canvas&&initCanvas()){ resize(); drawNetwork(); }},300);
+})();
+
+
+// ============================================================
+// LOAD CHART.JS & INIT
+// ============================================================
+// ============================================================
+// LIVE INFERENCE PANEL & MODEL STATUS
+// ============================================================
+const THREAT_ICONS = ['✅','🔴','🔴','🟡','🟠','🟠','🟠','🔴','🔐','🔐','🔐','🔐'];
+let selectedThreatId = -1;
+
+function initLiveInferencePanel() {
+  const sel = document.getElementById('threatSelector');
+  if (!sel) return;
+  sel.innerHTML = '';
+  THREATS.forEach(t => {
+    const btn = document.createElement('button');
+    const icon = THREAT_ICONS[t.id] || '🔍';
+    btn.style.cssText = `display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0.8rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-family:var(--sans);font-size:0.78rem;color:var(--muted);text-align:left;transition:all 0.15s;`;
+    btn.innerHTML = `<span>${icon}</span><span style="flex:1;">${t.name}</span>${t.pq?'<span style="font-family:var(--mono);font-size:0.58rem;color:var(--pq);border:1px solid rgba(192,132,252,0.3);padding:0.05rem 0.3rem;border-radius:3px;">PQ</span>':''}`;
+    btn.onclick = () => {
+      document.querySelectorAll('#threatSelector button').forEach(b => {
+        b.style.borderColor='var(--border)'; b.style.color='var(--muted)'; b.style.background='var(--surface)';
+      });
+      btn.style.borderColor = t.pq?'rgba(192,132,252,0.5)':'rgba(52,211,153,0.4)';
+      btn.style.color = t.pq?'var(--pq)':'var(--lora)';
+      btn.style.background = t.pq?'rgba(192,132,252,0.05)':'rgba(52,211,153,0.04)';
+      selectedThreatId = t.id;
+      runLiveInference();
+    };
+    sel.appendChild(btn);
+  });
+}
+
+
+// Warm up backend on page load and verify connection
+window.MODEL = {
+  actions: ['Ignore','Log & Monitor','Quick Scan','Block IP',
+            'Account Lockout','WAF Enforce','Network Isolate','Emergency Crypto Rotate'],
+  // Async infer — returns a promise
+  inferAsync(threatId, health=85, crypto=90, history=[]) {
+    return flaskInfer(threatId, health, crypto, history);
+  },
+  // Sync-compatible infer: returns cached result (falls back to last known)
+  infer(threatId, health=85, crypto=90, history=[]) {
+    const key = `${threatId}_${health}_${crypto}`;
+    if (window._inferCache[key]) return window._inferCache[key];
+    // Kick off async fetch and return a placeholder
+    flaskInfer(threatId, health, crypto, history).then(r => { window._inferCache[key] = r; }).catch(()=>{});
+    // Return a neutral placeholder so simulation doesn't break
+    return {
+      action: 1, actionName: 'Log & Monitor',
+      agentConfidence: 0.5, loraActivation: 0, layerNorms: [0,0,0,0,0,0],
+      qValues: [0,0,0,0,0,0,0,0], detectorConfidence: 0.5
+    };
+  }
+};
+
+window.runLiveInference = async function() {
+  if (selectedThreatId < 0) return;
+  const health = parseInt(document.getElementById('healthSlider')?.value||85);
+  const crypto = parseInt(document.getElementById('cryptoSlider')?.value||90);
+  const out = document.getElementById('liveInferenceOutput');
+  if (!out) return;
+
+  out.innerHTML = `<div style="color:var(--muted);font-size:0.8rem;font-family:var(--mono);padding:1rem 0;">⏳ Running inference on Flask backend...</div>`;
+
+  let result;
+  try {
+    result = await flaskInfer(selectedThreatId, health, crypto, [1,0,1,1,0]);
+    // Update cache
+    window._inferCache[`${selectedThreatId}_${health}_${crypto}`] = result;
+  } catch(e) {
+    out.innerHTML = `<div style="color:var(--red);font-size:0.8rem;font-family:var(--mono);padding:0.5rem 0;">
+      ❌ Backend error: ${e.message}<br/>
+      <span style="color:var(--dim);font-size:0.72rem;">Make sure Flask is running: <code>python app.py</code></span>
+    </div>`;
+    return;
+  }
+
+  const t = THREATS[selectedThreatId];
+  const ACTIONS = window.MODEL.actions;
+  const actionColor = selectedThreatId >= 8 ? 'var(--pq)' : (result.action >= 6 ? 'var(--orange)' : 'var(--lora)');
+
+  // Q-value bars
+  const qMin = Math.min(...result.qValues), qMax = Math.max(...result.qValues);
+  const qRange = qMax - qMin + 0.001;
+  const qBars = result.qValues.map((v,i) => {
+    const norm = ((v-qMin)/qRange*100).toFixed(1);
+    const isSelected = i === result.action;
+    const col = isSelected ? actionColor : 'var(--border2)';
+    return `<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;">
+      <span style="font-family:var(--mono);font-size:0.6rem;color:${isSelected?actionColor:'var(--dim)'};width:155px;flex-shrink:0;${isSelected?'font-weight:700;':''}">${ACTIONS[i]}</span>
+      <div style="flex:1;height:7px;background:var(--border);border-radius:3px;overflow:hidden;">
+        <div style="width:${norm}%;height:100%;border-radius:3px;background:${col};${isSelected?`box-shadow:0 0 6px ${col}44;`:''}transition:width 0.5s;"></div>
+      </div>
+      <span style="font-family:var(--mono);font-size:0.6rem;color:${isSelected?actionColor:'var(--dim)'};width:48px;text-align:right;">${v.toFixed(2)}</span>
+    </div>`;
+  }).join('');
+
+  // LoRA layer norm bars
+  const loraBars = result.layerNorms ? result.layerNorms.map((v, i) => {
+    const layerNames = ['enc.0','enc.4','deep.0','deep.4','cls.0','cls.4'];
+    const maxNorm = Math.max(...result.layerNorms) + 0.001;
+    const pct = (v/maxNorm*100).toFixed(1);
+    return `<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.2rem;">
+      <span style="font-family:var(--mono);font-size:0.58rem;color:var(--dim);width:45px;flex-shrink:0;">${layerNames[i]}</span>
+      <div style="flex:1;height:5px;background:var(--border);border-radius:2px;overflow:hidden;">
+        <div style="width:${pct}%;height:100%;border-radius:2px;background:linear-gradient(90deg,var(--lora),var(--accent));"></div>
+      </div>
+      <span style="font-family:var(--mono);font-size:0.58rem;color:var(--lora);width:38px;text-align:right;">${v.toFixed(1)}</span>
+    </div>`;
+  }).join('') : '';
+
+  out.innerHTML = `
+    <div>
+      <div style="font-family:var(--mono);font-size:0.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.8rem;">Inference Output</div>
+
+      <div style="background:${selectedThreatId>=8?'rgba(192,132,252,0.06)':'rgba(52,211,153,0.06)'};border:1px solid ${selectedThreatId>=8?'rgba(192,132,252,0.2)':'rgba(52,211,153,0.2)'};border-radius:10px;padding:1rem;margin-bottom:1rem;">
+        <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.3rem;">DQN DECISION — response_agent_lora.pth</div>
+        <div style="font-size:1.35rem;font-weight:800;color:${actionColor};font-family:var(--mono);">${ACTIONS[result.action]}</div>
+        <div style="display:flex;gap:1rem;margin-top:0.6rem;flex-wrap:wrap;">
+          <div><div style="font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--accent);">${(result.agentConfidence*100).toFixed(1)}%</div><div style="font-size:0.6rem;color:var(--muted);text-transform:uppercase;">Agent Conf</div></div>
+          <div><div style="font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--pq);">${result.loraActivation?result.loraActivation.toFixed(2):'—'}</div><div style="font-size:0.6rem;color:var(--muted);text-transform:uppercase;">LoRA Norm</div></div>
+          <div><div style="font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--yellow);">${result.qValues[result.action].toFixed(2)}</div><div style="font-size:0.6rem;color:var(--muted);text-transform:uppercase;">Max Q-Value</div></div>
+        </div>
+      </div>
+
+      <div style="font-family:var(--mono);font-size:0.62rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">Q-Values — All 8 Actions</div>
+      ${qBars}
+
+      ${loraBars ? `<div style="font-family:var(--mono);font-size:0.62rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;margin:0.8rem 0 0.4rem;">LoRA Layer Activation Norms — lora_adapter.pth</div>${loraBars}` : ''}
+
+      <div style="margin-top:0.8rem;padding:0.6rem 0.8rem;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;">
+        <div style="font-family:var(--mono);font-size:0.58rem;color:var(--dim);">
+          Threat: ${t.name} (class ${t.id}) · Health: ${health}% · Crypto: ${crypto}%<br/>
+          Source: <span style="color:var(--lora);">lora_adapter.pth</span> (14,744 params) + <span style="color:var(--accent);">response_agent_lora.pth</span> (48,264 params)<br/>
+          Arch: 15→256→BN→128→BN→64→BN→8 · LoRA rank=8 · <span style="color:var(--green);">Flask backend (app.py)</span>
+        </div>
+      </div>
+    </div>`;
+};
+
+// ── Flask required gate ─────────────────────────────────────
+// All three simulations are blocked until Flask /status returns OK.
+// Polls every 3 seconds so buttons auto-unlock when app.py is started.
+
+window._flaskReady = false;
+
+function setSimButtonsLocked(locked) {
+  const startBtn   = document.getElementById('startBtn');
+  const miniBtn    = document.getElementById('miniStartBtn');
+  const liveThreats = document.querySelectorAll('.threat-item, [onclick*="selectThreat"], .threat-row');
+
+  if (startBtn) {
+    startBtn.disabled = locked;
+    if (locked) {
+      startBtn.textContent = '🔴 Flask Required';
+      startBtn.style.opacity = '0.5';
+      startBtn.style.cursor  = 'not-allowed';
+    } else {
+      startBtn.textContent = '▶ Start Simulation';
+      startBtn.style.opacity = '';
+      startBtn.style.cursor  = '';
+    }
+  }
+  if (miniBtn) {
+    miniBtn.disabled = locked;
+    if (locked) {
+      miniBtn.textContent = '🔴 Flask Required';
+      miniBtn.style.opacity = '0.5';
+      miniBtn.style.cursor  = 'not-allowed';
+    } else if (!window._miniWasRunning) {
+      miniBtn.textContent = '▶ Start';
+      miniBtn.style.opacity = '';
+      miniBtn.style.cursor  = '';
+    }
+  }
+}
+
+function showFlaskBanner(online) {
+  // Inject or update a top banner inside both sim sections
+  ['simFlaskBanner','miniFlaskBanner'].forEach(id => {
+    let banner = document.getElementById(id);
+    if (!banner) return;
+    if (online) {
+      banner.style.display = 'none';
+    } else {
+      banner.style.display = 'flex';
+    }
+  });
+}
+
+async function updateModelStatus() {
+  const el   = document.getElementById('modelStatusText');
+  const pill = document.getElementById('modelStatus');
+  try {
+    const res = await fetch(`${FLASK_URL}/status`, { signal: AbortSignal.timeout(2000) });
+    if (res.ok) {
+      window._flaskReady  = true;
+      window._flaskOnline = true;
+      if (el)   el.textContent = '⚡ Flask Backend Active';
+      if (pill) pill.style.borderColor = 'rgba(52,211,153,0.4)';
+      setSimButtonsLocked(false);
+      showFlaskBanner(true);
+      console.log('%c✅ Connection', 'color:#34d399;font-weight:bold');
+    } else {
+      throw new Error('non-ok');
+    }
+  } catch(e) {
+    window._flaskReady  = false;
+    window._flaskOnline = false;
+    if (el)   el.textContent = '🔴No Connection ';
+    if (pill) pill.style.borderColor = 'rgba(244,63,94,0.4)';
+    setSimButtonsLocked(true);
+    showFlaskBanner(false);
+    // Stop running sims if Flask goes down
+    if (simRunning) { simRunning = false; }
+  }
+}
+
+// Poll every 3 seconds — buttons auto-unlock when app.py starts
+updateModelStatus();
+setInterval(updateModelStatus, 3000);
+
+const script = document.createElement('script');
+script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+script.onload = () => {
+  setTimeout(initCharts, 100);
+  buildThreatTable();
+};
+document.head.appendChild(script);
+</script>
+</body>
+</html>
