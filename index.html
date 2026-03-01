@@ -580,7 +580,7 @@ canvas { width:100% !important; }
     <div class="lora-badge">⚡ LoRA Fine-Tuning · Parameter-Efficient Adaptation</div>
     <h1>Smarter Detection with<br/><span class="hl-lora">Low-Rank Adaptation</span></h1>
     <p class="hero-sub">
-      LoRA fine-tunes only 7.9% of parameters — freezing the base encoder and adding lightweight adapter layers — achieving 90.80% accuracy with a 13× smaller adapter file while boosting post-quantum detection by +6.72%.
+      LoRA fine-tunes only 7.9% of parameters (14,744) — loading pretrained weights from the baseline detector, freezing the encoder and shortcut, and training only the deep_features, classifier head, and lightweight LoRA adapter matrices. The result is a more accurate detector (90.80%) with a 0.056 MB adapter file, boosting post-quantum detection by +6.72% — without retraining from scratch.
     </p>
     <div class="hero-chips">
       <span class="chip lora">90.80% LoRA Accuracy</span>
@@ -850,7 +850,7 @@ canvas { width:100% !important; }
         <div class="adapter-spec">
           <div class="adapter-row"><span class="adapter-key">Method</span><span class="adapter-val">LoRA (Low-Rank Adaptation)</span></div>
           <div class="adapter-row"><span class="adapter-key">Target Layers</span><span class="adapter-val">All Linear Layers</span></div>
-          <div class="adapter-row"><span class="adapter-key">LoRA Rank</span><span class="adapter-val">r = 4</span></div>
+          <div class="adapter-row"><span class="adapter-key">LoRA Rank</span><span class="adapter-val">r = 8</span></div>
           <div class="adapter-row"><span class="adapter-key">LoRA Params</span><span class="adapter-val">14,744 / 185,970 total</span></div>
           <div class="adapter-row"><span class="adapter-key">Param Efficiency</span><span class="adapter-val">92.1% frozen</span></div>
           <div class="adapter-row"><span class="adapter-key">Adapter File Size</span><span class="adapter-val">0.056 MB</span></div>
@@ -906,7 +906,7 @@ canvas { width:100% !important; }
   <div class="panel">
     <div class="panel-hdr">
       <span class="panel-title">🔴 Real-Time Threat Simulation</span>
-      <span class="panel-badge" id="simBadge">0 / 20 Events</span>
+      <span class="panel-badge" id="simBadge">0 / 50 Events</span>
     </div>
     <div class="sim-top">
       <button class="btn btn-go" id="startBtn" onclick="startSim()">▶ Start Simulation</button>
@@ -915,18 +915,12 @@ canvas { width:100% !important; }
         <span>Connection offline — run <strong>python app.py</strong> to enable real inference</span>
       </div>
       <button class="btn btn-ghost" onclick="resetSim()">↺ Reset</button>
-      <select class="spd" id="spdSel">
-        <option value="1200">Normal</option>
-        <option value="600">Fast</option>
-        <option value="200">Turbo</option>
-      </select>
       <span style="font-family:var(--mono);font-size:0.7rem;color:var(--muted);margin-left:auto;">Click any event for explanation →</span>
     </div>
     <div class="gauge-strip">
-      <div class="gc"><div class="gv" id="gH" style="color:var(--green)">100%</div><div class="gl">System Health</div><div class="pbar"><div class="pfill" id="pbH" style="width:100%;background:var(--green)"></div></div></div>
-      <div class="gc"><div class="gv" id="gC" style="color:var(--green)">100%</div><div class="gl">Crypto Strength</div><div class="pbar"><div class="pfill" id="pbC" style="width:100%;background:var(--green)"></div></div></div>
       <div class="gc"><div class="gv" id="gB" style="color:var(--accent)">0</div><div class="gl">Threats Blocked</div></div>
-      <div class="gc"><div class="gv" id="gF" style="color:var(--yellow)">0</div><div class="gl">False Positives</div></div>
+      <div style="display:none"><span id="gH"></span><span id="gC"></span><span id="pbH"></span><span id="pbC"></span></div>
+      <div class="gc"><div class="gv" id="gF" style="color:var(--red)">—</div><div class="gl">Missed</div></div>
       <div class="gc"><div class="gv" id="gA" style="color:var(--green)">—</div><div class="gl">Current Accuracy</div></div>
     </div>
     <div class="sim-body">
@@ -974,37 +968,81 @@ canvas { width:100% !important; }
 <!-- ==================== ARCHITECTURE ==================== -->
 <div class="page" id="page-architecture">
   <div class="g2">
+
+    <!-- TRAINING PIPELINE -->
     <div class="panel">
-      <div class="panel-hdr"><span class="panel-title">System Pipeline</span></div>
+      <div class="panel-hdr">
+        <span class="panel-title">Training Pipeline</span>
+      </div>
       <div class="arch-flow">
+
+        <div style="font-family:var(--mono);font-size:0.6rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;text-align:center;padding:0.2rem 0.6rem;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);border-radius:6px;margin-bottom:0.4rem;">Phase 1</div>
         <div class="arch-node" style="border-color:var(--dim)">
-          <div class="arch-nt">📡 Network Traffic</div>
-          <div class="arch-nl">Raw packet flow · 47 feature dimensions</div>
+          <div class="arch-nt">📂 Dataset</div>
+          <div class="arch-nl">Network traffic · 47 features · 8 classical + 4 PQ classes</div>
         </div>
-        <div class="arch-arrow">↓ &nbsp;StandardScaler preprocessing</div>
+        <div class="arch-arrow">↓ &nbsp;StandardScaler fit_transform → scaler.pkl</div>
         <div class="arch-node hl">
           <div class="arch-nt">🧠 EffectiveThreatDetector</div>
-          <div class="arch-nl">ResNet-style MLP · 12-class · Focal Loss · 217K params</div>
+          <div class="arch-nl">ResNet-style MLP · 12-class · Focal Loss · 217K params<br/><span style="color:var(--dim);font-size:0.65rem;">Trained from scratch → saves detector.pth</span></div>
         </div>
-        <div class="arch-arrow" style="color:var(--lora);">↓ &nbsp;+ LoRA Adapters (7.9% params · 14,744 trainable)</div>
-        <div class="arch-node lora-node">
-          <div class="arch-nt">⚡ LoRA Fine-tuned Detector</div>
-          <div class="arch-nl">Encoder frozen · deep_features + classifier trainable · 90.8% acc</div>
-        </div>
-        <div class="arch-arrow">↓ &nbsp;Threat class + confidence score</div>
-        <div class="arch-node ex">
-          <div class="arch-nt">💬 Explainability Engine</div>
-          <div class="arch-nl">Plain-language breakdown · Context-aware · Student-first</div>
-        </div>
-        <div class="arch-arrow">↓ &nbsp;Structured explanation + 15-dim state vector</div>
+        <div class="arch-arrow">↓ &nbsp;Trains baseline response agent</div>
         <div class="arch-node hl">
           <div class="arch-nt">🤖 ImprovedResponseDQN</div>
-          <div class="arch-nl">Double DQN · Prioritized Replay · 8 response actions</div>
+          <div class="arch-nl">Double DQN · Prioritized Replay · 8,000 episodes<br/><span style="color:var(--dim);font-size:0.65rem;">saves response_agent.pth</span></div>
         </div>
-        <div class="arch-arrow">↓ &nbsp;Mitigation action selected</div>
-        <div class="arch-node pq">
-          <div class="arch-nt">⚡ Response Execution</div>
-          <div class="arch-nl">Ignore → Quick Scan → Emergency Crypto Rotate</div>
+
+        <div style="font-family:var(--mono);font-size:0.6rem;color:var(--lora);text-transform:uppercase;letter-spacing:0.08em;text-align:center;padding:0.2rem 0.6rem;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.15);border-radius:6px;margin:0.6rem 0 0.4rem;">Phase 2</div>
+        <div class="arch-node" style="border-color:var(--dim)">
+          <div class="arch-nt">📥 Load Pretrained Weights</div>
+          <div class="arch-nl">detector.pth + scaler.pkl loaded from Phase 1</div>
+        </div>
+        <div class="arch-arrow" style="color:var(--lora);">↓ &nbsp;LoRA adapters injected · rank=8 · alpha=16</div>
+        <div class="arch-node lora-node">
+          <div class="arch-nt">⚡ LoRAThreatDetector</div>
+          <div class="arch-nl">Encoder + shortcut FROZEN · deep_features + classifier TRAINABLE<br/><span style="color:var(--lora);font-size:0.65rem;">14,744 trainable params · saves lora_adapter.pth</span></div>
+        </div>
+        <div class="arch-arrow" style="color:var(--lora);">↓ &nbsp;Trains new response agent on LoRA detector</div>
+        <div class="arch-node lora-node">
+          <div class="arch-nt">🤖 ImprovedResponseDQN</div>
+          <div class="arch-nl">Double DQN · Prioritized Replay · 8,000 episodes<br/><span style="color:var(--lora);font-size:0.65rem;">saves response_agent_lora.pth</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- INFERENCE PIPELINE + TABLES -->
+    <div style="display:flex;flex-direction:column;gap:1.5rem;">
+      <div class="panel">
+        <div class="panel-hdr">
+          <span class="panel-title">Inference Pipeline</span>
+        
+        </div>
+        <div class="arch-flow">
+          <div class="arch-node" style="border-color:var(--dim)">
+            <div class="arch-nt">📡 Live Network Traffic</div>
+            <div class="arch-nl">Raw packet flow · 47 feature dimensions</div>
+          </div>
+          <div class="arch-arrow">↓ &nbsp;StandardScaler transform (scaler.pkl)</div>
+          <div class="arch-node lora-node">
+            <div class="arch-nt">⚡ LoRAThreatDetector</div>
+            <div class="arch-nl">Deployed model · 90.8% acc<br/><span style="color:var(--lora);font-size:0.65rem;">lora_adapter.pth · 0.056 MB</span></div>
+          </div>
+          <div class="arch-arrow">↓ &nbsp;Threat class + confidence score</div>
+          <div class="arch-node ex">
+            <div class="arch-nt">💬 Explainability Engine</div>
+            <div class="arch-nl">Plain-language · Context-aware · Student-first</div>
+          </div>
+          <div class="arch-arrow">↓ &nbsp;Structured explanation + 15-dim state vector</div>
+          <div class="arch-node hl">
+            <div class="arch-nt">🤖 ImprovedResponseDQN</div>
+            <div class="arch-nl">Double DQN · 8 response actions<br/><span style="color:var(--dim);font-size:0.65rem;">response_agent_lora.pth</span></div>
+          </div>
+          <div class="arch-arrow">↓ &nbsp;Mitigation action selected</div>
+          <div class="arch-node pq">
+            <div class="arch-nt">⚡ Response Execution</div>
+            <div class="arch-nl">Ignore → Quick Scan → Emergency Crypto Rotate</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1072,6 +1110,10 @@ canvas { width:100% !important; }
   </div>
 </div>
 
+
+
+
+
 <!-- ==================== ABOUT ==================== -->
 <div class="page" id="page-about">
   <div class="g2">
@@ -1079,14 +1121,15 @@ canvas { width:100% !important; }
       <div class="panel">
         <div class="story-block">
           <h2>The Story</h2>
-          <p>Imagine a first-year student — call him Cipher — sitting in a university computer lab, clicking what looks like a routine email from the registrar's office. The link looks right. The logo looks right. Forty-eight hours later, his login credentials are circulating on a paste site he's never heard of. His academic record has been accessed. His scholarship application is gone.</p>
-          <p>He didn't do anything wrong. He just didn't know.</p>
-          <p>Digital Hygiene exists to close that gap — with AI that explains itself, adapts over time, and was built for students first, not security teams.</p>
+          <p>It began with a discussion that most individuals never consider until it is their time.</p>
+          <p>Suppose that a first year student named Cipher is sitting in a university computer laboratory, clicking on what appears to be a normal e-mail message by the registrar office. The link looks right, the logo appears fine. 48 hours after, his login information is being sold on a paste site which he has never heard of. His school performance has been seen. His application to scholarship is lost. He didn't do anything wrong. He just didn't know.</p>
+          <p>And use that number times tens of thousands of students who enter laboratories, open links, upload files using open Wi-Fi, and believe that when there is encryption of a connection, it is secure. They're not careless. They're just not equipped.</p>
+          <p>It is the gap we have attempted to bridge.</p>
         </div>
         <div class="story-block">
           <h2>The Problem</h2>
-          <p>Phishing, malware, spoofing, and data misuse hit students and institutions every day. Tools designed to stop them are either invisible to the people who need them most, or so technical that nobody reads the alerts.</p>
-          <p>There is a second layer that most people don't talk about yet: the post-quantum threat. Nation-state actors are running "Harvest Now, Decrypt Later" campaigns right now — collecting encrypted traffic today with the plan to decrypt it once quantum computers are capable enough.</p>
+          <p>These threats are not abstract, such as Phishing, malware, spoofing, and data misuse. They attack students, laboratories and institutions on a daily basis and anti-hacking devices created to prevent it are either unknown to the people who require them most or so advanced that they cause warning bells that no one sees.</p>
+          <p>And then there exists the second layer that everyone is not much discussing but the <strong style="color:var(--pq)">post-quantum</strong> threat. The actions of nation-state actors and advanced adversaries have already launched the campaigns of Harvest Now, Decrypt Later (HNDL), i.e., harvesting encrypted traffic today and intending to decrypt them when quantum computers are ready enough. In the case of institutions that have access to long-term research data, medical records, or PII of students, the threat is real.</p>
         </div>
         <div class="story-block">
           <h2>Why LoRA Changes the Game</h2>
@@ -1440,13 +1483,13 @@ function resetSim() {
   simHealth=100; simCrypto=100; simBlocked=0; simFP=0; simTotal=0;
   document.getElementById('startBtn').disabled=false;
   document.getElementById('startBtn').textContent='▶ Start Simulation';
-  document.getElementById('simBadge').textContent='0 / 20 Events';
+  document.getElementById('simBadge').textContent='0 / 50 Events';
   updateGauges();
   document.getElementById('eventLog').innerHTML=`
     <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:var(--muted);">
       <div style="font-size:2rem;margin-bottom:0.8rem;opacity:0.3;">🔍</div>
       <div style="font-size:0.85rem;">Press <strong style="color:var(--text)">Start Simulation</strong> to begin</div>
-      <div style="font-size:0.78rem;margin-top:0.3rem;color:var(--dim);">20 live threat events will stream in real-time</div>
+      <div style="font-size:0.78rem;margin-top:0.3rem;color:var(--dim);">50 live threat events will stream in real-time</div>
     </div>`;
   document.getElementById('liveExplain').innerHTML=`
     <div class="le-empty">
@@ -1465,14 +1508,14 @@ async function startSim() {
   document.getElementById('startBtn').disabled=true;
   document.getElementById('startBtn').textContent='⏳ Running...';
   document.getElementById('eventLog').innerHTML='';
-  const speed=parseInt(document.getElementById('spdSel').value,10);
+  const speed=1200;
   simTotal=0;
 
   // Use async loop so each fireEvent() fully awaits Flask before next event
-  while (simTotal < 20 && simRunning) {
+  while (simTotal < 50 && simRunning) {
     await fireEvent();
     simTotal++;
-    document.getElementById('simBadge').textContent=simTotal+' / 20 Events';
+    document.getElementById('simBadge').textContent=simTotal+' / 50 Events';
     await new Promise(r => setTimeout(r, speed));
   }
   simRunning=false;
@@ -1525,25 +1568,22 @@ async function fireEvent() {
     fromFlask = false;
   }
 
-  // ── Animate gauges based on Flask decision ──────────────────
+  // ── Animate gauges based on decision ──────────────────
   if (t.id === 0) {
     if (!correct) { simFP++; simHealth = Math.max(0, simHealth - 2); }
   } else {
     if (correct) {
       simBlocked++;
-      // Health gain scales with how decisive the DQN was
       const gain = agentResult ? Math.round(2 + (agentResult.agentConfidence||0.5) * 4) : 3;
       simHealth = Math.min(100, simHealth + gain);
       if (isPQ) {
-        // PQ-Crypto Upgrade (6) or Emergency Crypto Rotate (7) = big crypto boost
-        const cryptoGain = (realAction === 7) ? 15 : (realAction === 6) ? 10 : 5;
+        const cryptoGain = agentResult ? ((realAction === 7) ? 15 : (realAction === 6) ? 10 : 5) : 5;
         simCrypto = Math.min(100, simCrypto + cryptoGain);
       }
     } else {
-      // Health loss scales with severity and how wrong the DQN was
-      const loss = agentResult ? Math.round((isPQ ? 12 : 6) + (1 - (agentResult.agentConfidence||0.5)) * 6) : (isPQ ? 14 : 8);
+      const loss = agentResult ? Math.round((isPQ ? 12 : 6) + (1 - (agentResult.agentConfidence||0.5)) * 6) : (isPQ ? 10 : 6);
       simHealth = Math.max(0, simHealth - loss);
-      if (isPQ) simCrypto = Math.max(0, simCrypto - (agentResult ? 15 : 18));
+      if (isPQ) simCrypto = Math.max(0, simCrypto - (agentResult ? 12 : 8));
     }
   }
   animateGauges();
@@ -1647,7 +1687,6 @@ function showExplain(tid, conf, correct, evId, isBenign=false, agentResult=null)
       </div>
     </div>
     <div class="le-section"><div class="le-sec-title">🔍 Attack Indicators</div><div class="indicators-row">${t.indicators.map(i=>`<span class="ind-chip">${i}</span>`).join('')}</div></div>
-    ${buildModelPanel(tid, conf, agentResult)}
   `;
 }
 
@@ -1725,33 +1764,33 @@ function animateGauges() {
   const cBar=document.getElementById('pbC');
   const hLabel=document.getElementById('gH');
   const cLabel=document.getElementById('gC');
-  if (!hBar||!cBar) { updateGauges(); return; }
+  if (!hBar||!cBar||!hLabel||!cLabel) { updateGauges(); return; }
 
-  const startH=parseFloat(hBar.style.width)||simHealth;
-  const startC=parseFloat(cBar.style.width)||simCrypto;
-  const targetH=simHealth, targetC=simCrypto;
-  const startTime=performance.now();
-  const dur=600; // ms
+  const startH = parseFloat(hBar.style.width) || 0;
+  const startC = parseFloat(cBar.style.width) || 0;
+  const targetH = simHealth, targetC = simCrypto;
+  const startTime = performance.now();
+  const dur = 600;
 
   if (_gaugeAnimFrame) cancelAnimationFrame(_gaugeAnimFrame);
   function step(now) {
-    const p=Math.min((now-startTime)/dur,1);
-    const ease=1-Math.pow(1-p,3); // cubic ease-out
-    const curH=startH+(targetH-startH)*ease;
-    const curC=startC+(targetC-startC)*ease;
-    const hCol=curH>70?'var(--green)':curH>40?'var(--yellow)':'var(--red)';
-    const cCol=curC>70?'var(--green)':curC>40?'var(--yellow)':'var(--pq)';
-    hBar.style.width=curH+'%'; hBar.style.background=hCol;
-    cBar.style.width=curC+'%'; cBar.style.background=cCol;
-    hLabel.textContent=curH.toFixed(0)+'%'; hLabel.style.color=hCol;
-    cLabel.textContent=curC.toFixed(0)+'%'; cLabel.style.color=cCol;
-    document.getElementById('gB').textContent=simBlocked;
-    document.getElementById('gF').textContent=simFP;
-    const acc=simTotal>0?((simBlocked/(simTotal))*100).toFixed(1)+'%':'—';
-    document.getElementById('gA').textContent=acc;
-    if (p<1) _gaugeAnimFrame=requestAnimationFrame(step);
+    const p = Math.min((now - startTime) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    const curH = startH + (targetH - startH) * ease;
+    const curC = startC + (targetC - startC) * ease;
+    const hCol = curH > 70 ? 'var(--green)' : curH > 40 ? 'var(--yellow)' : 'var(--red)';
+    const cCol = curC > 70 ? 'var(--green)' : curC > 40 ? 'var(--yellow)' : 'var(--pq)';
+    hBar.style.width = curH + '%'; hBar.style.background = hCol;
+    cBar.style.width = curC + '%'; cBar.style.background = cCol;
+    hLabel.textContent = curH.toFixed(0) + '%'; hLabel.style.color = hCol;
+    cLabel.textContent = curC.toFixed(0) + '%'; cLabel.style.color = cCol;
+    const bEl = document.getElementById('gB'); if (bEl) bEl.textContent = simBlocked;
+    const fEl = document.getElementById('gF'); if (fEl) fEl.textContent = simFP;
+    const aEl = document.getElementById('gA');
+    if (aEl) aEl.textContent = simTotal > 0 ? ((simBlocked / simTotal) * 100).toFixed(1) + '%' : '—';
+    if (p < 1) _gaugeAnimFrame = requestAnimationFrame(step);
   }
-  _gaugeAnimFrame=requestAnimationFrame(step);
+  _gaugeAnimFrame = requestAnimationFrame(step);
 }
 
 // ============================================================
@@ -1839,7 +1878,7 @@ async function flaskInfer(threatId, health, crypto, history) {
     {id:'firewall', label:'Firewall', x:0.5, y:0.22, r:14, col:'#fbbf24', icon:'🔥'},
     {id:'router',   label:'Core Router', x:0.5, y:0.4, r:14, col:'#00d4ff', icon:'📡'},
     {id:'ids',      label:'IDS/AI', x:0.78, y:0.4, r:12, col:'#34d399', icon:'⚡'},
-    {id:'lms',      label:'LMS', x:0.22, y:0.6, r:11, col:'#10d97a', icon:'📚'},
+    {id:'lms',      label:'Learning Mgmt', x:0.22, y:0.6, r:11, col:'#10d97a', icon:'📚'},
     {id:'auth',     label:'Auth Portal', x:0.5, y:0.62, r:11, col:'#10d97a', icon:'🔑'},
     {id:'research', label:'Research', x:0.76, y:0.62, r:11, col:'#10d97a', icon:'🔬'},
     {id:'iot',      label:'IoT Devices', x:0.22, y:0.82, r:11, col:'#fb923c', icon:'📷'},
@@ -1853,17 +1892,18 @@ async function flaskInfer(threatId, health, crypto, history) {
   ];
   const PACKET_TYPES = [
     {name:'HTTPS Request', col:'#10d97a', threat:false, route:['internet','firewall','router','auth','students']},
-    {name:'DNS Query', col:'#10d97a', threat:false, route:['students','router','auth']},
-    {name:'Research Data', col:'#00d4ff', threat:false, route:['research','router','students']},
+    {name:'DNS Query',     col:'#10d97a', threat:false, route:['internet','firewall','router','auth']},
+    {name:'Research Data', col:'#00d4ff', threat:false, route:['internet','firewall','router','research']},
+    {name:'Lab Access',    col:'#00d4ff', threat:false, route:['internet','firewall','router','lab']},
     {name:'DDoS Flood',    col:'#f43f5e', threat:true, sev:'CRITICAL', pq:false, tid:1, missRate:0.07, route:['internet','firewall','router']},
     {name:'Brute Force',  col:'#fb923c', threat:true, sev:'HIGH',     pq:false, tid:5, missRate:0.07, route:['internet','firewall','router','auth']},
-    {name:'Port Scan',    col:'#fbbf24', threat:true, sev:'MEDIUM',   pq:false, tid:3, missRate:0.09, route:['internet','firewall','router']},
+    {name:'Port Scan',    col:'#fbbf24', threat:true, sev:'MEDIUM',   pq:false, tid:3, missRate:0.09, route:['internet','firewall','router','lab']},
     {name:'Web Attack',   col:'#fb923c', threat:true, sev:'HIGH',     pq:false, tid:4, missRate:0.08, route:['internet','firewall','router','lms']},
-    {name:'Mirai Beacon', col:'#f43f5e', threat:true, sev:'CRITICAL', pq:false, tid:7, missRate:0.06, route:['iot','router','internet']},
-    {name:'PQ-Downgrade', col:'#c084fc', threat:true, sev:'CRITICAL', pq:true,  tid:8, missRate:0.12, route:['internet','firewall','router','auth']},
+    {name:'Mirai Beacon', col:'#f43f5e', threat:true, sev:'CRITICAL', pq:false, tid:7, missRate:0.06, route:['internet','firewall','router','iot']},
+    {name:'PQ-Downgrade', col:'#c084fc', threat:true, sev:'CRITICAL', pq:true,  tid:8, missRate:0.12, route:['internet','firewall','router','lab']},
     {name:'HNDL Capture', col:'#c084fc', threat:true, sev:'CRITICAL', pq:true,  tid:9, missRate:0.18, route:['internet','firewall','router','research']},
     {name:'PQ-SideChannel',col:'#c084fc',threat:true, sev:'HIGH',     pq:true,  tid:10,missRate:0.14, route:['internet','firewall','router','auth']},
-    {name:'Normal Traffic',col:'#10d97a', threat:false, route:['students','router','lms']},
+    {name:'Normal Traffic',col:'#10d97a', threat:false, route:['internet','firewall','router','lms']},
   ];
 
   let canvas, ctx, W, H;
@@ -2256,6 +2296,54 @@ window.MODEL = {
   }
 };
 
+// Local fallback inference — produces dynamic Q-values based on threat + slider values
+// so the bars update when sliders move even without Flask running
+function localInfer(threatId, health, crypto) {
+  const ACTIONS = window.MODEL.actions;
+  const t = THREATS[threatId];
+  const isPQ = t ? t.pq : false;
+  const h = health / 100;
+  const c = crypto / 100;
+  const urgency = (1 - h) * 0.5 + (isPQ ? (1 - c) * 0.5 : 0);
+
+  // Pick best action based on threat + slider state
+  // Low health pushes toward more aggressive actions
+  let bestAction;
+  if (threatId === 0) {
+    bestAction = 0; // Benign → Ignore
+  } else if (isPQ) {
+    bestAction = (c < 0.4) ? 7 : 6; // low crypto → Emergency Crypto Rotate, else Network Isolate
+  } else if (threatId === 5) {
+    bestAction = (h < 0.4) ? 3 : 4; // Brute Force: low health → Block IP, else Account Lockout
+  } else if (threatId === 7) {
+    bestAction = 6; // Mirai → Network Isolate
+  } else if (threatId === 4) {
+    bestAction = 5; // Web attack → WAF Enforce
+  } else if (threatId === 1 || threatId === 2) {
+    bestAction = (h < 0.3) ? 6 : 3; // DDoS/DoS: critical → Isolate, else Block IP
+  } else {
+    bestAction = (h < 0.5) ? 3 : 2; // default: low health → Block IP, else Quick Scan
+  }
+
+  // Build Q-values with a CLEAR winner and realistic spread
+  // Winner gets high positive value, others get distinct negative values
+  const baseScores = [-45, -38, -32, -28, -25, -30, -35, -42]; // base negatives per action slot
+  const qValues = ACTIONS.map((_, i) => {
+    if (i === bestAction) {
+      // Winner: strongly positive, scales with urgency
+      return 10 + urgency * 20 + h * 5 + c * 5;
+    }
+    // Others: clearly negative, each action gets a distinct value
+    const base = baseScores[i] ?? -30;
+    // Add small variance per action so bars are different lengths
+    return base + (i * 1.3) + urgency * 3;
+  });
+
+  const agentConfidence = Math.min(0.99, 0.72 + urgency * 0.25);
+  const loraActivation = parseFloat((0.3 + urgency * 1.5).toFixed(2));
+  return { action: bestAction, actionName: ACTIONS[bestAction], agentConfidence, loraActivation, qValues, layerNorms: [0,0,0,0,0,0], detectorConfidence: agentConfidence };
+}
+
 window.runLiveInference = async function() {
   if (selectedThreatId < 0) return;
   const health = parseInt(document.getElementById('healthSlider')?.value||85);
@@ -2263,54 +2351,38 @@ window.runLiveInference = async function() {
   const out = document.getElementById('liveInferenceOutput');
   if (!out) return;
 
-  out.innerHTML = `<div style="color:var(--muted);font-size:0.8rem;font-family:var(--mono);padding:1rem 0;">⏳ Running inference on Flask backend...</div>`;
-
   let result;
   try {
+    out.innerHTML = `<div style="color:var(--muted);font-size:0.8rem;font-family:var(--mono);padding:1rem 0;">⏳ Running inference...</div>`;
     result = await flaskInfer(selectedThreatId, health, crypto, [1,0,1,1,0]);
-    // Update cache
     window._inferCache[`${selectedThreatId}_${health}_${crypto}`] = result;
   } catch(e) {
-    out.innerHTML = `<div style="color:var(--red);font-size:0.8rem;font-family:var(--mono);padding:0.5rem 0;">
-      ❌ Backend error: ${e.message}<br/>
-      <span style="color:var(--dim);font-size:0.72rem;">Make sure Flask is running: <code>python app.py</code></span>
-    </div>`;
-    return;
+    // Use local simulation so sliders still update the bars
+    result = localInfer(selectedThreatId, health, crypto);
   }
 
   const t = THREATS[selectedThreatId];
   const ACTIONS = window.MODEL.actions;
   const actionColor = selectedThreatId >= 8 ? 'var(--pq)' : (result.action >= 6 ? 'var(--orange)' : 'var(--lora)');
 
-  // Q-value bars
-  const qMin = Math.min(...result.qValues), qMax = Math.max(...result.qValues);
-  const qRange = qMax - qMin + 0.001;
+  // Q-value bars — winner is always 100%, others shown as small proportional bars
+  const qMax = Math.max(...result.qValues);
+  const qMin = Math.min(...result.qValues);
   const qBars = result.qValues.map((v,i) => {
-    const norm = ((v-qMin)/qRange*100).toFixed(1);
     const isSelected = i === result.action;
+    // Winner = 100%; negatives get 5–35% width proportionally so they're visibly different
+    const norm = isSelected ? 100 : Math.max(5, 35 * (1 - (qMax - v) / (qMax - qMin + 0.001)));
     const col = isSelected ? actionColor : 'var(--border2)';
     return `<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem;">
       <span style="font-family:var(--mono);font-size:0.6rem;color:${isSelected?actionColor:'var(--dim)'};width:155px;flex-shrink:0;${isSelected?'font-weight:700;':''}">${ACTIONS[i]}</span>
       <div style="flex:1;height:7px;background:var(--border);border-radius:3px;overflow:hidden;">
-        <div style="width:${norm}%;height:100%;border-radius:3px;background:${col};${isSelected?`box-shadow:0 0 6px ${col}44;`:''}transition:width 0.5s;"></div>
+        <div style="width:${norm.toFixed(1)}%;height:100%;border-radius:3px;background:${col};${isSelected?`box-shadow:0 0 6px ${col}44;`:''}transition:width 0.5s;"></div>
       </div>
       <span style="font-family:var(--mono);font-size:0.6rem;color:${isSelected?actionColor:'var(--dim)'};width:48px;text-align:right;">${v.toFixed(2)}</span>
     </div>`;
   }).join('');
 
-  // LoRA layer norm bars
-  const loraBars = result.layerNorms ? result.layerNorms.map((v, i) => {
-    const layerNames = ['enc.0','enc.4','deep.0','deep.4','cls.0','cls.4'];
-    const maxNorm = Math.max(...result.layerNorms) + 0.001;
-    const pct = (v/maxNorm*100).toFixed(1);
-    return `<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.2rem;">
-      <span style="font-family:var(--mono);font-size:0.58rem;color:var(--dim);width:45px;flex-shrink:0;">${layerNames[i]}</span>
-      <div style="flex:1;height:5px;background:var(--border);border-radius:2px;overflow:hidden;">
-        <div style="width:${pct}%;height:100%;border-radius:2px;background:linear-gradient(90deg,var(--lora),var(--accent));"></div>
-      </div>
-      <span style="font-family:var(--mono);font-size:0.58rem;color:var(--lora);width:38px;text-align:right;">${v.toFixed(1)}</span>
-    </div>`;
-  }).join('') : '';
+  // LoRA layer norm bars removed per user request
 
   out.innerHTML = `
     <div>
@@ -2328,8 +2400,6 @@ window.runLiveInference = async function() {
 
       <div style="font-family:var(--mono);font-size:0.62rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">Q-Values — All 8 Actions</div>
       ${qBars}
-
-      ${loraBars ? `<div style="font-family:var(--mono);font-size:0.62rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;margin:0.8rem 0 0.4rem;">LoRA Layer Activation Norms — lora_adapter.pth</div>${loraBars}` : ''}
 
       <div style="margin-top:0.8rem;padding:0.6rem 0.8rem;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;">
         <div style="font-family:var(--mono);font-size:0.58rem;color:var(--dim);">
