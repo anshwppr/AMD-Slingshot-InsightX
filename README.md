@@ -55,8 +55,8 @@ Digital Hygiene is an AI-powered, explainable post-quantum cybersecurity defense
 | PQ Response Accuracy | 96.65% |
 | Average Detection Confidence | 79.9% |
 | Average RL Reward | 49.71 |
-| Total Parameters | 217,890 |
-| Model Size | 0.87 MB |
+| Total Parameters | 185,970 |
+| Model Size | 0.709 MB |
 
 ### LoRA Fine-tuned Model
 
@@ -65,10 +65,11 @@ Digital Hygiene is an AI-powered, explainable post-quantum cybersecurity defense
 | Detection Accuracy | 89.20% | **90.80%** | +1.60% |
 | PQ Detection Accuracy | 82.93% | **89.64%** | +6.72% |
 | Response Accuracy | 88.10% | **90.20%** | +2.10% |
-| PQ Response Accuracy | 96.65% | **98.61%** | +1.96% |
+| PQ Response Accuracy | 96.65% | **96.65%** | — |
 | F1-Score | 0.890 | **0.906** | +0.016 |
+| Confidence Score | 79.9% | **83.2%** | +3.3% |
 | Trainable Parameters | 185,970 (100%) | **14,744 (7.9%)** | 92.1% frozen |
-| Adapter Size | 0.87 MB | **0.056 MB** | 13× smaller |
+| Adapter Size | 0.709 MB | **0.056 MB** | 13× smaller |
 
 ---
 
@@ -101,11 +102,13 @@ Place your trained `.pth` files inside the `models/` folder:
 
 ```
 models/
-├── lora_adapter.pth               ← LoRA adapter weights
-└── response_agent_lora.pth        ← Response agent weights
+├── detector.pth                   ← Baseline detector weights (0.709 MB)
+├── lora_adapter.pth               ← LoRA adapter weights (0.056 MB)
+├── response_agent.pth             ← Baseline response agent weights
+└── response_agent_lora.pth        ← LoRA response agent weights
 ```
 
-> The models folder is intentionally excluded from version control (see `.gitignore`).  
+> The models folder is intentionally excluded from version control (see `.gitignore`).
 > Train your own using the notebooks, or download pre-trained weights separately.
 
 ### 5. Run the Flask backend
@@ -150,15 +153,15 @@ Network Traffic (47 features)
         │
         ▼  StandardScaler preprocessing
 ┌───────────────────────────┐
-│   EffectiveThreatDetector  │  ResNet-style MLP · 12-class · 217K params
+│   EffectiveThreatDetector  │  ResNet-style MLP · 12-class · 185K params · 0.709 MB
 └─────────────┬─────────────┘
               │
-              │  + LoRA Adapters (7.9% params · 14,744 trainable)
+              │  + LoRA Adapters (rank=4 · 14,744 trainable · 0.056 MB)
               ▼
 ┌───────────────────────────┐
-│   LoRA Fine-tuned Detector │  Encoder frozen · deep_features + classifier trainable
+│   LoRAThreatDetector       │  Encoder frozen · deep_features + classifier + adapters trainable
 └─────────────┬─────────────┘
-              │  Threat class + confidence score
+              │  Threat class + confidence score (83.2% avg)
               ▼
 ┌───────────────────────────┐
 │   Explainability Engine    │  Plain-language · Context-aware · Student-first
@@ -166,7 +169,7 @@ Network Traffic (47 features)
               │  Structured explanation + 15-dim state vector
               ▼
 ┌───────────────────────────┐
-│   ImprovedResponseDQN      │  Double DQN · Prioritized Replay · 8 response actions
+│   ImprovedResponseDQN      │  Double DQN · Prioritized Replay · 8,000 episodes · 8 response actions
 └─────────────┬─────────────┘
               │  Mitigation action selected
               ▼
@@ -183,6 +186,18 @@ Network Traffic (47 features)
 - **Loss:** Weighted Focal Loss (γ=2.0) for class imbalance
 - **Optimizer:** AdamW (lr=0.001, weight_decay=1e-4)
 - **Training:** 100 epochs, batch 256, early stopping (patience=35)
+- **Total Parameters:** 185,970
+- **Model Size:** 0.709 MB
+
+### LoRA Threat Detector — LoRAThreatDetector
+
+- **Base:** Loads pretrained weights from `detector.pth`
+- **Frozen:** Input BN + Encoder block (low-level features preserved)
+- **Trainable:** Deep features (192→128→64), classifier head (→12), LoRA adapters on all linear layers
+- **LoRA Rank:** 4 (A×B decomposition, 14,744 params total)
+- **Param Efficiency:** 92.1% frozen (171,226 params), 7.9% trainable (14,744 params)
+- **Adapter Size:** 0.056 MB (13× smaller than full model)
+- **Training:** 100 epochs, same optimizer as baseline
 
 ### Threat Classes
 
@@ -206,15 +221,15 @@ Network Traffic (47 features)
 - **Architecture:** DQN with LayerNorm: 256 → 128 → 64 → 8 (actions)
 - **State space (15 dimensions):** threat class, confidence, detection correctness, PQ flags, system health, crypto strength, uncertainty proxy, categorical threat range indicators
 - **Action space (8 actions):** Ignore, Quick Scan, Full Scan, Quarantine, Delete, Network Isolate, PQ-Crypto Upgrade, Emergency Crypto Rotate
-- **Training:** Double DQN, Prioritized Experience Replay (capacity 30,000), epsilon decay 1.0→0.02, γ=0.99
+- **Training:** Double DQN, Prioritized Experience Replay (capacity 30,000), epsilon decay 1.0→0.02, γ=0.99, **8,000 episodes**
 - **Optimizer:** AdamW (lr=0.0003, weight_decay=1e-5), gradient clipping (10.0)
 
 ### LoRA Configuration
 
 ```python
 LORA_CONFIG = {
-    'rank': 8,           # Low-rank dimension
-    'alpha': 16,         # Scaling factor (2× rank)
+    'rank': 4,           # Low-rank dimension
+    'alpha': 8,          # Scaling factor (2× rank)
     'dropout': 0.1,      # LoRA dropout
     'use_lora': True,
     'lora_layers': 'all'
@@ -243,15 +258,17 @@ digital_hygiene/
 ├── index.html                      # Interactive threat simulation dashboard
 ├── baseline_detector.ipynb         # Baseline training notebook (EffectiveThreatDetector)
 ├── lora_enhanced_detector.ipynb    # LoRA fine-tuning notebook (LoRAThreatDetector)
-├── lora_results.png                # LoRA training visualizations
-├── results.png                     # Baseline training visualizations
+├── training_lora.png               # LoRA training visualizations
+├── training_baseline.png           # Baseline training visualizations
 ├── lora_results_summary.json       # LoRA metrics summary
 ├── results_summarybaseline.json    # Baseline metrics summary
 ├── requirements.txt                # Python dependencies
 ├── README.md                       # This document
 └── models/
+    ├── detector.pth                # Baseline detector weights (0.709 MB)
     ├── lora_adapter.pth            # LoRA adapter weights (0.056 MB)
-    └── response_agent_lora.pth     # Response agent weights
+    ├── response_agent.pth          # Baseline response agent weights
+    └── response_agent_lora.pth     # LoRA response agent weights
 ```
 
 ---
@@ -284,7 +301,7 @@ Open and run `baseline_detector.ipynb` — trains `EffectiveThreatDetector` and 
 
 ### LoRA fine-tuning
 
-Open and run `lora_enhanced_detector.ipynb` — loads `detector.pth`, applies LoRA adapters, saves `lora_adapter.pth` and `response_agent_lora.pth`.
+Open and run `lora_enhanced_detector.ipynb` — loads `detector.pth`, applies LoRA adapters (rank=4), saves `lora_adapter.pth` and `response_agent_lora.pth`.
 
 ---
 
