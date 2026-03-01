@@ -149,32 +149,7 @@ Post-quantum threat classes (PQ-Downgrade, PQ-HNDL, PQ-SideChannel, PQ-Hybrid) a
 ### System Pipeline
 
 ```
-Network Traffic (47 features)
-        │
-        ▼  StandardScaler preprocessing
-┌───────────────────────────┐
-│   EffectiveThreatDetector  │  ResNet-style MLP · 12-class · 185K params · 0.709 MB
-└─────────────┬─────────────┘
-              │
-              │  + LoRA Adapters (rank=4 · 14,744 trainable · 0.056 MB)
-              ▼
-┌───────────────────────────┐
-│   LoRAThreatDetector       │  Encoder frozen · deep_features + classifier + adapters trainable
-└─────────────┬─────────────┘
-              │  Threat class + confidence score (83.2% avg)
-              ▼
-┌───────────────────────────┐
-│   Explainability Engine    │  Plain-language · Context-aware · Student-first
-└─────────────┬─────────────┘
-              │  Structured explanation + 15-dim state vector
-              ▼
-┌───────────────────────────┐
-│   ImprovedResponseDQN      │  Double DQN · Prioritized Replay · 8,000 episodes · 8 response actions
-└─────────────┬─────────────┘
-              │  Mitigation action selected
-              ▼
-       Response Execution
-  Ignore → Quick Scan → Emergency Crypto Rotate
+![System Architecture](system.jpeg)
 ```
 
 ### Detection Model — EffectiveThreatDetector
