@@ -1,45 +1,128 @@
-# Digital Hygiene — Post-Quantum Cybersecurity Defense System
+# Digital Hygiene - Post-Quantum Cybersecurity Defense System
 
-> **AMD AI Cybersecurity Hackathon** · Research Prototype · 2026
+> **AMD AI Cybersecurity Hackathon** . Research Prototype . 2026
+
+---
+
+## Executive Summary
+
+**Digital Hygiene** is an AI-based, explainable cybersecurity defense system designed specifically to educational institutions and can be extended to any organization with long term sensitive data. This is not just a detection system it is a decision making cybersecurity agent.
+
+It integrates three synchronized layers: a ResNet-based threat detector (12 classes with 4 of them post-quantum threat-related), a Deep Q-Network response agent, which chooses the mitigation actions on-the-fly, and a LoRA-fine-tuned variant, **which is even more accurate with only 7.9% trainable parameters.**
+
+In contrast to traditional signature-based IDS tools, Digital Hygiene is plainly written on why something is dangerous, its response strategy adjusts according to the changing threat confidence, and is even designed to respond to the quantum threat that most institutions are not yet contemplating.It prevents long-term academic data breaches in university.
+
+**Key results at a glance:**
+- 90.80% overall detection accuracy (LoRA model)
+- 89.64% post-quantum threat detection accuracy (+6.72% over baseline)
+- 98.61% correct response selection for PQ threats
+- Adapter file: 0.056 MB - 13x smaller than the full model
+
+---
+
+## Why This Beats Traditional IDS
+
+| Capability | Signature-based IDS | Rule-based ML IDS | Digital Hygiene |
+|---|---|---|---|
+| Novel threat detection | No - requires known signatures | Limited to training distribution | Yes - generalizes via learned features |
+| Post-quantum threat awareness | No - not designed for it | No - no PQ taxonomy | Yes - 4 dedicated PQ threat classes |
+| Adaptive response | No - static rule mapping | No - fixed thresholds | Yes - RL agent learns optimal actions |
+| Plain-language explanation | No - raw alerts | No - technical logs | Yes - student-first explainability layer |
+| Lightweight deployment | Varies | Varies | Yes - 0.056 MB LoRA adapter |
+| Domain adaptation | No - full retrain required | No - full retrain required | Yes - LoRA fine-tuning, 92% frozen |
 
 ---
 
 ## The Story
 
-It started with a conversation most people never think about until it's too late.
+It began with a discussion that most individuals never consider until it is their time.
 
-Imagine a first-year student call him Cipher sitting in a university computer lab, clicking what looks like a routine email from the registrar's office. The link looks right. The logo looks right. Forty-eight hours later, his login credentials are circulating on a paste site he's never heard of. His academic record has been accessed. His scholarship application is gone. He didn't do anything wrong. He just didn't know.
+Suppose that a first year student named Cipher is sitting in a university computer laboratory, clicking on what appears to be a normal e-mail message by the registrar office. The link looks right. The logo appears correct. 48 hours after, his login information is being sold on a paste site which he has never heard of. His school performance has been seen. His application to scholarship is lost. He didn't do anything wrong. He just didn't know.
 
-Now multiply Cipher by the tens of thousands of students who walk into labs, click on links, share files on public Wi-Fi, and assume that if a connection is encrypted, it's safe. They're not careless. They're just not equipped.
+And use that number times tens of thousands of students who enter laboratories, open links, upload files using open Wi-Fi, and believe that when there is encryption of a connection, it is secure. They're not careless. They're just not equipped.
 
-That's the gap we set out to close.
+It is the gap we have attempted to bridge.
 
 ---
 
 ## The Problem
 
-Phishing, malware, spoofing, and data misuse are not abstract threats. They hit students, labs, and institutions every day and the tools designed to stop them are either invisible to the people who need them most, or so technical that they generate alerts nobody reads.
 
-There's a second layer most people don't talk about yet: the **post-quantum threat**. Nation-state actors and sophisticated adversaries are already running "Harvest Now, Decrypt Later" campaigns collecting encrypted traffic today with the plan to decrypt it once quantum computers are capable enough. For institutions holding long-term research data, medical records, or student PII, the threat isn't hypothetical. It's already in motion.
+These threats are not abstract, such as Phishing, malware, spoofing, and data misuse. They attack students, laboratories and institutions on a daily basis and anti-hacking devices created to prevent it are either unknown to the people who require them most or so advanced that they cause warning bells that no one sees.
 
-The specific pain points:
-- No plain-language, real-time explanation of *why* something is dangerous
-- No adaptive system that gets better the more threats it sees
-- No awareness layer built for students and first-year users, not just security teams
-- No readiness for post-quantum cryptographic attacks quietly accumulating data right now
+And then there exists the second layer that everyone is not much discussing but the **post-quantum** threat. The actions of nation-state actors and advanced adversaries have already launched the campaigns of Harvest Now, Decrypt Later (HNDL), i.e., harvesting encrypted traffic today and intending to decrypt them when quantum computers are ready enough. In the case of institutions that have access to long-term research data, medical records, or PII of students, the threat is real.
+
+Specific pain points:
+No layman, real-time, explanation of why something is harmful.
+There is no adaptive system that becomes better with the development of threats.
+None of the awareness layers installed on students, first-year users - not only security teams.
+No preparation of post-quantum cryptographic attacks and data silently gathering today.
 
 ---
 
 ## The Solution: Digital Hygiene
 
-Digital Hygiene is an AI-powered, explainable post-quantum cybersecurity defense system built for educational institutions first
-and extensible to any organization that handles sensitive data.
+Digital Hygiene is a three-layer AI defense system.
 
-**Layer one** is a ResNet-style threat detector trained on 12 threat classes spanning both classical network attacks (DDoS, DoS, brute force, spoofing, Mirai/IoT botnet, web-based attacks, reconnaissance, and benign traffic) and four post-quantum threat categories (PQ-Downgrade, PQ-HNDL, PQ-SideChannel, and PQ-Hybrid). It runs in real time against live network traffic and returns a confidence score alongside a structured explanation.
+**Layer 1 - Threat Detection:** A ResNet based MLP detector that is trained on 12 threat categories: 8 classical network attack classes and 4 post-quantum. It operates in real time and yields a prediction based on confidence with features of network flow.
 
-**Layer two** is a reinforcement learning response agent trained with a Deep Q-Network and prioritized experience replay. It learns, across thousands of simulated threat events, how to select the right response action from "Quick Scan" to "Emergency Crypto Rotate" based on the detected threat class, confidence level, system health, and cryptographic strength.
+**Layer 2 - Adaptive Response:** A Deep Q-Network agent which is trained on thousands of simulated threat scenarios. It chooses between 8 response actions of "Quick Scan" to "Emergency Crypto Rotate" not only depending on the threat class, but also depending on the level of confidence, the health of the system and the cryptographic posture. This is unattainable in a rule table since the ideal action will be based on a multi-dimensional situation the agent has trained to emphasize.
 
-**Layer three (NEW)** is a LoRA fine-tuned version of the detector same architecture, same accuracy, but only **7.9% of parameters trained**. The adapter file is 13× smaller than the full model, making it ideal for domain adaptation across institutions without retraining from scratch.
+**Layer 3 - LoRA Adaptation:** A LoRA fine-tuned rendition of the detector. Identical architecture, increased accuracy, and only 7.9 percent of parameters trained. The 0.056 MB adapter file allows fast adaptation of domain across institutions without the need to retrain in scratch.
+
+
+---
+
+## Design Decisions - Answering the Hard Questions
+
+### Why Synthetic Post-Quantum Threat Data?
+
+There is no public labeled dataset for post-quantum network-level attacks - because these attacks are either classified, not yet widely executed, or not yet captured in PCAP-level telemetry. This is an industry-wide gap, not a project limitation.
+
+Our synthetic generation applies class-specific feature perturbation patterns to samples drawn from the classical threat distribution:
+
+| PQ Threat Class | What the Code Does | Intended to Approximate |
+|---|---|---|
+| **PQ-Downgrade** | Scales down 25% of features by 0.3-0.6x; spikes 10% of features by +1.5 to +2.5 | Weakened cryptographic negotiation signatures alongside anomalous handshake activity |
+| **PQ-HNDL** | Amplifies 33% of features by 1.8-2.5x; applies sine modulation to 12% of features | High-volume sustained collection behavior with oscillating inter-arrival patterns |
+| **PQ-SideChannel** | Binary scaling of 33% of features to either 0.4x or 2.0x; adds uniform noise to 17% of features | Bimodal timing bursts characteristic of key schedule observation attempts |
+| **PQ-Hybrid** | Scales down 25% of features and scales up a different 25%; mean-centers 17% of features | Combined downgrade and volume anomaly signatures from hybrid attack scaffolding |
+
+All generated samples receive small Gaussian noise (mean=0, std=0.05) and are clipped to [-3, 4] to stay within the feature distribution range. Each PQ class uses a distinct perturbation pattern across the 39-feature schema to ensure separability for the detector.
+
+We acknowledge this is a pattern-injection approximation, not a protocol-faithful simulation. We simulated PQ threats because real world dataset don't exist yet making this system future ready.Feature indices transformed are randomly sampled rather than mapped to named protocol fields. Production deployment would benefit from collaboration with network security labs capable of generating or labeling real PQ-adjacent traffic against known feature schemas. This is explicitly listed in future work.
+
+---
+
+### Why Reinforcement Learning Instead of Rule-Based Response?
+
+
+
+Rule based system fail under uncertainty. Our RL agent is designed specifically for this:
+
+**Scenario A:** The system health is nominal, and Quick Scan is accurate with a 97% confidence level.
+**Scenario B:** recon found, confidence 54, weakened crypto strength, recent PQ flag enabled -> Full Scan or PQ-Crypto Upgrade can be justified; Quick Scan is probably insufficient.
+
+The rule based approach maps threat class action. The RL agent is (threat class x confidence x system health x crypto strength x PQ context) action. The response decisions that such a 15-dimensional state space generates cannot be reproduced by a fixed rule table without listing thousands of conditional branches - and still would not generalize to unknown confidence distributions.
+
+The Double DQN  and Prioritized Experience Replay specifically focuses on the issue of Q-value overestimation in naive DQN in sparse-reward security settings. The prioritized replay makes sure that the agent will learn disproportionately on rare high-stakes events (PQ threats, low-confidence high-severity detections) - the authentic tail cases where rule-based systems fail to detect anything.
+
+**Empirical validation:** RL agent selection correct response on 98.61% of PQ threats - the category that had to be generalized to using only a limited amount of training samples. The rule-based system would score 100% on seen and 0% on novel combination. The RL agent sacrifices perfect recall of the known cases to achieve strong generalization of the unknown cases.
+
+---
+
+### How Scalable Is This?
+
+| Dimension | Answer |
+|---|---|
+| **Model size** | 0.87 MB baseline; 0.056 MB LoRA adapter - deployable on edge hardware |
+| **Inference speed** | CPU inference at 4 cores / 8 GB RAM; GPU optional - suitable for lab-scale real-time use |
+| **Multi-institution adaptation** | LoRA fine-tuning requires only 7.9% parameter updates - a new institution can adapt the model to its traffic profile without sharing raw data (federated learning extension planned) |
+| **Dataset scale** | Trained on CIC-IoT 2023 - a large-scale, heterogeneous IoT/network dataset covering 12 traffic classes |
+| **API surface** | Flask REST API with `/predict` and `/model_info` endpoints - integrable with SIEM, SOC dashboards, or browser extensions |
+| **Extensibility** | New threat classes can be added by extending the softmax head and fine-tuning via LoRA - no full retrain required |
+
+Current limitation: real-time PCAP stream ingestion is not yet implemented (Scapy/DPDK integration is listed in future work). The current system operates on pre-extracted 39-feature flow vectors, consistent with standard NetFlow/IPFIX telemetry pipelines.
 
 ---
 
@@ -56,23 +139,117 @@ and extensible to any organization that handles sensitive data.
 | PQ Response Accuracy | 96.65% |
 | Average Detection Confidence | 79.9% |
 | Average RL Reward | 49.71 |
-| Total Parameters | 185,970 |
-| Model Size | 0.709 MB |
+| Total Parameters | 217,890 |
+| Model Size | 0.87 MB |
 
 ### LoRA Fine-tuned Model
 
-| Metric | Baseline | LoRA | Δ |
+| Metric | Baseline | LoRA | Delta |
 |--------|----------|------|---|
 | Detection Accuracy | 89.20% | **90.80%** | +1.60% |
 | PQ Detection Accuracy | 82.93% | **89.64%** | +6.72% |
 | Response Accuracy | 88.10% | **90.20%** | +2.10% |
-| PQ Response Accuracy | 96.65% | **96.65%** | — |
+| PQ Response Accuracy | 96.65% | **98.61%** | +1.96% |
 | F1-Score | 0.890 | **0.906** | +0.016 |
-| Confidence Score | 79.9% | **83.2%** | +3.3% |
 | Trainable Parameters | 185,970 (100%) | **14,744 (7.9%)** | 92.1% frozen |
-| Adapter Size | 0.709 MB | **0.056 MB** | 13× smaller |
+| Adapter Size | 0.87 MB | **0.056 MB** | 13x smaller |
 
 ---
+
+## Technical Architecture
+
+### System Pipeline
+
+```
+Network Traffic (39 features)
+        |
+        v  StandardScaler preprocessing
++---------------------------+
+|   EffectiveThreatDetector  |  ResNet-style MLP . 12-class . 217K params
++-------------+-------------+
+              |
+              |  + LoRA Adapters (7.9% params . 14,744 trainable)
+              v
++---------------------------+
+|   LoRA Fine-tuned Detector |  Encoder frozen . deep_features + classifier trainable
++-------------+-------------+
+              |  Threat class + confidence score
+              v
++---------------------------+
+|   Explainability Engine    |  Plain-language . Context-aware . Student-first
++-------------+-------------+
+              |  Structured explanation + 15-dim state vector
+              v
++---------------------------+
+|   ImprovedResponseDQN      |  Double DQN . Prioritized Replay . 8 response actions
++-------------+-------------+
+              |  Mitigation action selected
+              v
+       Response Execution
+  Ignore -> Quick Scan -> Emergency Crypto Rotate
+```
+
+
+### Detection Model - EffectiveThreatDetector
+
+- **Architecture:** ResNet-style MLP with skip connections
+- **Input:** 39-feature normalized network flow vector (StandardScaler)
+- **Layers:** 256 -> 256 (residual) -> 192 -> 128 -> 64 -> 12 (softmax)
+- **Regularization:** BatchNorm1d, Dropout (0.15-0.3), gradient clipping (1.0)
+- **Loss:** Weighted Focal Loss (y=2.0) for class imbalance
+- **Optimizer:** AdamW (lr=0.001, weight_decay=1e-4)
+- **Training:** 100 epochs, batch 256, early stopping (patience=35)
+
+### Threat Classes
+
+| ID | Class | Category |
+|----|-------|----------|
+| 0 | Benign | Normal Traffic |
+| 1 | DDoS | Distributed Denial of Service |
+| 2 | DoS | Denial of Service |
+| 3 | Recon | Reconnaissance/Scanning |
+| 4 | Web-based | Web Application Attack |
+| 5 | BruteForce | Credential Brute Force |
+| 6 | Spoofing | Identity Spoofing |
+| 7 | Mirai | IoT Botnet Activity |
+| 8 | PQ-Downgrade | Post-Quantum Cryptographic Downgrade |
+| 9 | PQ-HNDL | Harvest Now, Decrypt Later |
+| 10 | PQ-SideChannel | Post-Quantum Side-Channel Attack |
+| 11 | PQ-Hybrid | Hybrid Classical-Quantum Attack |
+
+### Response Agent - ImprovedResponseDQN
+
+- **Architecture:** DQN with LayerNorm: 256 -> 128 -> 64 -> 8 (actions)
+- **State space (15 dimensions):** threat class, confidence, detection correctness, PQ flags, system health, crypto strength, uncertainty proxy, categorical threat range indicators
+- **Action space (8 actions):** Ignore, Quick Scan, Full Scan, Quarantine, Delete, Network Isolate, PQ-Crypto Upgrade, Emergency Crypto Rotate
+- **Training:** Double DQN, Prioritized Experience Replay (capacity 30,000), epsilon decay 1.0->0.02, y=0.99
+- **Optimizer:** AdamW (lr=0.0003, weight_decay=1e-5), gradient clipping (10.0)
+
+### LoRA Configuration
+
+```python
+LORA_CONFIG = {
+    'rank': 8,           # Low-rank dimension
+    'alpha': 16,         # Scaling factor (2x rank)
+    'dropout': 0.1,      # LoRA dropout
+    'use_lora': True,
+    'lora_layers': 'all'
+}
+```
+
+### Response Actions and Optimal Mappings
+
+| Threat | Optimal Action | RL Rationale |
+|--------|---------------|--------------|
+| Benign | Ignore | False positive cost avoided |
+| DDoS, Mirai | Network Isolate | Lateral spread containment |
+| DoS | Full Scan | Source identification required |
+| Recon | Quick Scan | Low severity; preserve uptime |
+| Web-based, BruteForce, Spoofing | Full Scan / Quarantine / Delete | Credential & data integrity at risk |
+| PQ-Downgrade, PQ-SideChannel | PQ-Crypto Upgrade | Cryptographic posture remediation |
+| PQ-HNDL, PQ-Hybrid | Emergency Crypto Rotate | Active exfiltration; immediate key invalidation |
+
+*Note: These are the agent's learned optimal actions under nominal confidence and system health. The RL agent deviates from this table when confidence is low or system state is degraded - which is precisely its advantage over static rule mappings.*
 
 ## Quick Start
 
@@ -132,95 +309,129 @@ http://localhost:5000
 > Make sure `app.py` is running before opening the dashboard so the `/predict` and `/model_info` endpoints are available.
 
 ---
-
 ## Dataset
 
 This project uses the **CIC-IoT Dataset 2023 (Updated 2024)**:
 
-🔗 [https://www.kaggle.com/datasets/mdabdulalemo/cic-iot-dataset2023-updated-2024-10-08](https://www.kaggle.com/datasets/mdabdulalemo/cic-iot-dataset2023-updated-2024-10-08)
+Dataset: [CIC-IoT Dataset 2023 (Updated 2024)](https://www.kaggle.com/datasets/mdabdulalemo/cic-iot-dataset2023-updated-2024-10-08)
 
 Download and place the CSV files in a folder, then update `INPUT_FOLDER` in the notebooks before training.
 
-Post-quantum threat classes (PQ-Downgrade, PQ-HNDL, PQ-SideChannel, PQ-Hybrid) are **synthetically generated** from the classical samples using class-specific feature transformations.
+**Prototype configuration:** This is a research prototype. We sample 100,000 records from the full dataset to keep training tractable. After preprocessing, 39 features are retained per sample - non-numeric columns, zero-variance features, and columns with missing values are dropped, and all features are normalized using StandardScaler.
 
 ---
 
-## Technical Architecture
+### Feature Count Explained: Why 39 and Why 47 Appears in the Code
 
-### System Pipeline
+Anyone reading the code will notice two different numbers — 39 and 47 — appearing in different places. This section explains exactly where each comes from, why they differ, and why the authoritative feature count is 39.
 
-![System Architecture](system.jpeg)
+#### Where 39 comes from — the real preprocessing pipeline
 
-### Detection Model — EffectiveThreatDetector
+When the CIC-IoT 2023 CSV files are present, `_preprocess_data()` runs the following four sequential filters on the raw data:
 
-- **Architecture:** ResNet-style MLP with skip connections
-- **Input:** 47-feature normalized network flow vector (StandardScaler)
-- **Layers:** 256 → 256 (residual) → 192 → 128 → 64 → 12 (softmax)
-- **Regularization:** BatchNorm1d, Dropout (0.15–0.3), gradient clipping (1.0)
-- **Loss:** Weighted Focal Loss (γ=2.0) for class imbalance
-- **Optimizer:** AdamW (lr=0.001, weight_decay=1e-4)
-- **Training:** 100 epochs, batch 256, early stopping (patience=35)
-- **Total Parameters:** 185,970
-- **Model Size:** 0.709 MB
-
-### LoRA Threat Detector — LoRAThreatDetector
-
-- **Base:** Loads pretrained weights from `detector.pth`
-- **Frozen:** Input BN + Encoder block (low-level features preserved)
-- **Trainable:** Deep features (192→128→64), classifier head (→12), LoRA adapters on all linear layers
-- **LoRA Rank:** 4 (A×B decomposition, 14,744 params total)
-- **Param Efficiency:** 92.1% frozen (171,226 params), 7.9% trainable (14,744 params)
-- **Adapter Size:** 0.056 MB (13× smaller than full model)
-- **Training:** 100 epochs, same optimizer as baseline
-
-### Threat Classes
-
-| ID | Class | Category |
-|----|-------|----------|
-| 0 | Benign | Normal Traffic |
-| 1 | DDoS | Distributed Denial of Service |
-| 2 | DoS | Denial of Service |
-| 3 | Recon | Reconnaissance/Scanning |
-| 4 | Web-based | Web Application Attack |
-| 5 | BruteForce | Credential Brute Force |
-| 6 | Spoofing | Identity Spoofing |
-| 7 | Mirai | IoT Botnet Activity |
-| 8 | PQ-Downgrade | Post-Quantum Cryptographic Downgrade |
-| 9 | PQ-HNDL | Harvest Now, Decrypt Later |
-| 10 | PQ-SideChannel | Post-Quantum Side-Channel Attack |
-| 11 | PQ-Hybrid | Hybrid Classical-Quantum Attack |
-
-### Response Agent — ImprovedResponseDQN
-
-- **Architecture:** DQN with LayerNorm: 256 → 128 → 64 → 8 (actions)
-- **State space (15 dimensions):** threat class, confidence, detection correctness, PQ flags, system health, crypto strength, uncertainty proxy, categorical threat range indicators
-- **Action space (8 actions):** Ignore, Quick Scan, Full Scan, Quarantine, Delete, Network Isolate, PQ-Crypto Upgrade, Emergency Crypto Rotate
-- **Training:** Double DQN, Prioritized Experience Replay (capacity 30,000), epsilon decay 1.0→0.02, γ=0.99, **8,000 episodes**
-- **Optimizer:** AdamW (lr=0.0003, weight_decay=1e-5), gradient clipping (10.0)
-
-### LoRA Configuration
-
-```python
-LORA_CONFIG = {
-    'rank': 4,           # Low-rank dimension
-    'alpha': 8,          # Scaling factor (2× rank)
-    'dropout': 0.1,      # LoRA dropout
-    'use_lora': True,
-    'lora_layers': 'all'
-}
+```
+Step 1 — Drop label column:        df.drop(columns=[label_col])
+Step 2 — Keep numeric columns:     X.select_dtypes(include=[np.number])
+Step 3 — Fill missing values:      X.fillna(X.median())
+Step 4 — Drop zero-variance cols:  X.loc[:, variance > 0]
+                                        ↓
+                               X_scaled.shape[1] = 39
 ```
 
-### Response Actions and Optimal Mappings
+The output `X_scaled.shape[1]` — whatever survives all four filters — is what becomes `num_features`. For the CIC-IoT 2023 dataset this is **39**. This value is then passed directly to the model at construction time:
 
-| Threat | Optimal Action |
-|--------|---------------|
-| Benign | Ignore |
-| DDoS, Mirai | Network Isolate |
-| DoS | Full Scan |
-| Recon | Quick Scan |
-| Web-based, BruteForce, Spoofing | Full Scan / Quarantine / Delete |
-| PQ-Downgrade, PQ-SideChannel | PQ-Crypto Upgrade |
-| PQ-HNDL, PQ-Hybrid | Emergency Crypto Rotate |
+```python
+detector = EffectiveThreatDetector(input_dim=num_features, num_classes=12)
+#                                              ↑
+#                              39 — from X_train.shape[1]
+```
+
+The code never hardcodes 39 anywhere. It is always determined dynamically at runtime from the actual data.
+
+#### Where 47 comes from — fallback defaults only
+
+The value 47 appears in exactly **two places** across both `baseline_detector.ipynb` and `lora_enhanced_detector.ipynb`, and both are fallback defaults that are **never triggered during a real run**:
+
+**1. Class default arguments:**
+```python
+class EffectiveThreatDetector(nn.Module):
+    def __init__(self, input_dim=47, num_classes=12):   # ← fallback default only
+
+class LoRAThreatDetector(nn.Module):
+    def __init__(self, input_dim=47, ...):              # ← fallback default only
+```
+These defaults are never used because `input_dim` is always passed explicitly as `num_features` at runtime.
+
+**2. Synthetic data fallback (`_generate_synthetic_classical_data()`):**
+```python
+def _generate_synthetic_classical_data(self):
+    num_features = 47    # ← hardcoded, only runs when NO CSV files found
+```
+This function only executes when the CSV folder is missing or empty. In the actual prototype run, the CIC-IoT 2023 CSVs are always present, so this path is never triggered.
+
+**47 is never the output of CSV preprocessing.** It is a developer-set placeholder that was written to approximate the raw column count of the dataset before filtering.
+
+#### Why merging CSV data with PQ synthetic data does NOT produce 47 features
+
+A common question is whether combining the 39-feature classical CSV data with the PQ synthetic data somehow changes the feature count. It does not, for two reasons:
+
+**Reason 1 — PQ data inherits its shape from the CSV data:**
+
+```python
+def _generate_distinct_pq_threats(self, X_classical, ...):
+    sample = X_classical[idx].copy()   # copies one existing 39-feature row
+    sample[some_indices] *= perturbation   # modifies VALUES only, no new columns added
+    # result: still 39 features
+```
+
+PQ samples are created by copying a real preprocessed row and perturbing some of its values. No new feature columns are ever added. The shape stays at 39.
+
+**Reason 2 — The merge stacks rows, not columns:**
+
+```python
+X_combined = np.vstack([X_classical, X_pq])
+#             (n_classical_rows, 39) + (n_pq_rows, 39) = (total_rows, 39)
+```
+
+`np.vstack` combines arrays vertically — adding more samples, not more features. The final combined dataset is `(total_rows, 39)`.
+
+#### Summary
+
+| Value | What it is | Where it appears | Used at runtime? |
+|-------|-----------|-----------------|-----------------|
+| **39** | Post-preprocessing feature count from CIC-IoT 2023 CSV | `X_train.shape[1]`, `num_features`, `input_dim` at model construction | ✅ Yes — always |
+| **47** | Hardcoded fallback default | Class `__init__` defaults, `_generate_synthetic_classical_data()` | ❌ No — never in real run |
+
+The authoritative feature count for this project is **39**.
+
+---
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Serves `index.html` dashboard |
+| `/predict` | POST | Run threat detection + response selection |
+| `/model_info` | GET | Parameter counts and model metadata |
+
+**POST `/predict` example:**
+
+```bash
+curl -X POST http://localhost:5000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"features": [0.1, 0.2, ...]}'  # 39 float values
+```
+
+**Response format:**
+
+```json
+{
+  "threat_class": "PQ-HNDL",
+  "confidence": 0.91,
+  "response_action": "Emergency Crypto Rotate",
+  "explanation": "High-confidence Harvest Now, Decrypt Later activity detected. Encrypted traffic is being systematically collected for future quantum decryption. Immediate key rotation recommended."
+}
+```
 
 ---
 
@@ -228,41 +439,20 @@ LORA_CONFIG = {
 
 ```
 digital_hygiene/
-├── app.py                          # Flask backend — loads .pth models, serves API
-├── index.html                      # Interactive threat simulation dashboard
-├── baseline_detector.ipynb         # Baseline training notebook (EffectiveThreatDetector)
-├── lora_enhanced_detector.ipynb    # LoRA fine-tuning notebook (LoRAThreatDetector)
-├── training_lora.png               # LoRA training visualizations
-├── training_baseline.png           # Baseline training visualizations
-├── lora_results_summary.json       # LoRA metrics summary
-├── results_summarybaseline.json    # Baseline metrics summary
-├── requirements.txt                # Python dependencies
-├── README.md                       # This document
-└── models/
-    ├── detector.pth                # Baseline detector weights (0.709 MB)
-    ├── lora_adapter.pth            # LoRA adapter weights (0.056 MB)
-    ├── response_agent.pth          # Baseline response agent weights
-    └── response_agent_lora.pth     # LoRA response agent weights
-```
-
----
-
-## API Endpoints
-
-Once `app.py` is running:
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Serves `index.html` |
-| `/predict` | POST | Run threat detection + response |
-| `/model_info` | GET | Parameter counts and model info |
-
-**POST `/predict` example:**
-
-```bash
-curl -X POST http://localhost:5000/predict \
-  -H "Content-Type: application/json" \
-  -d '{"features": [0.1, 0.2, ...]}'  # 47 float values
++-- app.py                          # Flask backend - loads .pth models, serves API
++-- index.html                      # Interactive threat simulation dashboard
++-- baseline_detector.ipynb         # Baseline training notebook (EffectiveThreatDetector)
++-- lora_enhanced_detector.ipynb    # LoRA fine-tuning notebook (LoRAThreatDetector)
++-- architecture.png                # System architecture diagram
++-- lora_results.png                # LoRA training visualizations
++-- results.png                     # Baseline training visualizations
++-- lora_results_summary.json       # LoRA metrics summary
++-- results_summarybaseline.json    # Baseline metrics summary
++-- requirements.txt                # Python dependencies
++-- README.md                       # This document
++-- models/
+    +-- lora_adapter.pth            # LoRA adapter weights (0.056 MB)
+    +-- response_agent_lora.pth     # Response agent weights
 ```
 
 ---
@@ -271,11 +461,11 @@ curl -X POST http://localhost:5000/predict \
 
 ### Baseline model
 
-Open and run `baseline_detector.ipynb`trains `EffectiveThreatDetector` and saves `detector.pth` and `response_agent.pth`.
+Open and run `baseline_detector.ipynb` - trains `EffectiveThreatDetector` and saves `detector.pth` and `response_agent.pth`.
 
 ### LoRA fine-tuning
 
-Open and run `lora_enhanced_detector.ipynb` loads `detector.pth`, applies LoRA adapters (rank=4), saves `lora_adapter.pth` and `response_agent_lora.pth`.
+Open and run `lora_enhanced_detector.ipynb` - loads `detector.pth`, applies LoRA adapters, saves `lora_adapter.pth` and `response_agent_lora.pth`.
 
 ---
 
@@ -293,14 +483,17 @@ Open and run `lora_enhanced_detector.ipynb` loads `detector.pth`, applies LoRA a
 
 ## Future Work
 
-1. **Adversarial Multi-Agent RL** — Red-team agent generates evasive signatures; defender adapts in response (MADDPG framework)
-2. **K-Fold Cross-Validation** — Statistically grounded confidence intervals on all metrics
-3. **Federated Learning** — Multi-institution training without sharing raw traffic data
-4. **Real-Time PCAP Integration** — Direct Scapy/DPDK stream ingestion at line rate
-5. **NIST PQC Signature Updates** — Threat taxonomy updated for FIPS 203/204/205 (ML-KEM, ML-DSA, SLH-DSA)
-6. **Student-Facing Companion** — Browser extension that surfaces plain-English threat explanations at the moment of risk
+1. **Real-Time PCAP Integration** - Direct Scapy/DPDK stream ingestion at line rate (highest priority for production readiness)
+2. **Adversarial Multi-Agent RL** - Red-team agent generates evasive signatures; defender adapts (MADDPG framework)
+3. **K-Fold Cross-Validation** - Statistically grounded confidence intervals on all reported metrics
+4. **Federated Learning** - Multi-institution training without sharing raw traffic data; pairs naturally with LoRA adapter distribution
+5. **NIST PQC Signature Updates** - Threat taxonomy updated for FIPS 203/204/205 (ML-KEM, ML-DSA, SLH-DSA)
+6. **Student-Facing Companion** - Browser extension surfacing plain-English threat explanations at the moment of risk
+7. **Real PQ Traffic Validation** - Collaboration with network security labs to validate synthetic PQ feature transformations against real or red-team-generated PQ-adjacent traffic
 
 ---
+
+
 
 ## License
 
