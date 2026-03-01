@@ -62,13 +62,13 @@ No preparation of post-quantum cryptographic attacks and data silently gathering
 
 ## The Solution: Digital Hygiene
 
-Digital Hygiene is a three-layer AI defense system.
+Digital Hygiene is a layered AI defense system.
 
-**Layer 1 - Threat Detection:** A ResNet based MLP detector that is trained on 12 threat categories: 8 classical network attack classes and 4 post-quantum. It operates in real time and yields a prediction based on confidence with features of network flow.
-
-**Layer 2 - Adaptive Response:** A Deep Q-Network agent which is trained on thousands of simulated threat scenarios. It chooses between 8 response actions of "Quick Scan" to "Emergency Crypto Rotate" not only depending on the threat class, but also depending on the level of confidence, the health of the system and the cryptographic posture. This is unattainable in a rule table since the ideal action will be based on a multi-dimensional situation the agent has trained to emphasize.
-
-**Layer 3 - LoRA Adaptation:** A LoRA fine-tuned rendition of the detector. Identical architecture, increased accuracy, and only 7.9 percent of parameters trained. The 0.056 MB adapter file allows fast adaptation of domain across institutions without the need to retrain in scratch.
+**The first layer** is the EffectiveThreatDetector a ResNet-style MLP that is trained on 12 threat classes both based on classical network attacks (DDoS, DoS, brute force, spoofing, Mirai/IoT botnet, web-based attacks, reconnaissance, and benign traffic) and four post-quantum threat types (PQ-Downgrade, PQ-HNDL, PQ-SideChannel, and PQ-Hybrid). It works in real time with a live network traffic and displays a threat class and confidence score.
+**The second layer** is the Explainability Engine - plain-language, context-aware, student-first module that receives the threat class and confidence score of the detector and generates a structured explanation and a 15-dimensional state vector encoding threat class, confidence level, system health and cryptographic strength.
+**The third layer** is the ImprovedResponseDQN - which is a reinforcement learning response agent that was trained using Double DQN and prioritized experience replay over 8,000 simulated threat events. It takes the 15-dim state vector at the Explainability Engine and chooses the suitable mitigation measure.
+**The fourth layer** is Response execution, where the chosen mitigation measure is implemented, which may be an Ignore of non-malicious traffic, a Quick Scan or Full Scan, up to the Network Isolate, PQ-Crypto Upgrade, and Emergency Crypto Rotate responses to the most serious post-quantum threats.
+**LoRA Fine-tuned Detector** (upgrade to Layer one) - does not represent a distinct pipeline stage, but instead a much more parameter-efficient replacement of the baseline detector. It also uses the baseline pretrained weights as an input, freezes the encoder and residual shortcut, and only trains the deep features, classifier head, and lightweight LoRA adapter matrices (only 7.9% of the total parameters -14,744 trainable). On top of this fine-tuned detector a separate response agent is then trained. It is the best to use in domain adaptation between institutions without the need to retrain completely with the 0.056 MB adapter file.
 
 
 ---
