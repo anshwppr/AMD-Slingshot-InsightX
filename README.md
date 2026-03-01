@@ -10,7 +10,7 @@
 
 It integrates three synchronized layers: a ResNet-based threat detector (12 classes with 4 of them post-quantum threat-related), a Deep Q-Network response agent, which chooses the mitigation actions on-the-fly, and a LoRA-fine-tuned variant, **which is even more accurate with only 7.9% trainable parameters.**
 
-In contrast to traditional signature-based IDS tools, Digital Hygiene is plainly written on why something is dangerous, its response strategy adjusts according to the changing threat confidence, and is even designed to respond to the quantum threat that most institutions are not yet contemplating.It prevents long-term academic data breaches in university.
+In contrast to traditional signature-based IDS tools, Digital Hygiene is plainly written on why something is dangerous, its response strategy adjusts according to the changing threat confidence, and is even designed to respond to the quantum threat that most institutions are not yet contemplating.It prevents long-term academic data breaches in universities.
 
 **Key results at a glance:**
 - 90.80% overall detection accuracy (LoRA model)
