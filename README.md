@@ -24,12 +24,12 @@ In contrast to traditional signature-based IDS tools, Digital Hygiene is plainly
 
 | Capability | Signature-based IDS | Rule-based ML IDS | Digital Hygiene |
 |---|---|---|---|
-| Novel threat detection | No - requires known signatures | Limited to training distribution | Yes - generalizes via learned features |
-| Post-quantum threat awareness | No - not designed for it | No - no PQ taxonomy | Yes - 4 dedicated PQ threat classes |
-| Adaptive response | No - static rule mapping | No - fixed thresholds | Yes - RL agent learns optimal actions |
-| Plain-language explanation | No - raw alerts | No - technical logs | Yes - student-first explainability layer |
-| Lightweight deployment | Varies | Varies | Yes - 0.056 MB LoRA adapter |
-| Domain adaptation | No - full retrain required | No - full retrain required | Yes - LoRA fine-tuning, 92% frozen |
+| Novel threat detection | No requires known signatures | Limited to training distribution | Yes generalizes via learned features |
+| Post-quantum threat awareness | No not designed for it | No PQ taxonomy | Yes 4 dedicated PQ threat classes |
+| Adaptive response | No static rule mapping | No fixed thresholds | Yes  RL agent learns optimal actions |
+| Plain-language explanation | No raw alerts | No technical logs | Yes student-first explainability layer |
+| Lightweight deployment | Varies | Varies | Yes 0.056 MB LoRA adapter |
+| Domain adaptation | No full retrain required | No full retrain required | Yes LoRA fine-tuning, 92% frozen |
 
 ---
 
@@ -55,7 +55,7 @@ And then there exists the second layer that everyone is not much discussing but 
 Specific pain points:
 No layman, real-time, explanation of why something is harmful.
 There is no adaptive system that becomes better with the development of threats.
-None of the awareness layers installed on students, first-year users - not only security teams.
+None of the awareness layers installed on students, first-year users not only security teams.
 No preparation of post-quantum cryptographic attacks and data silently gathering today.
 
 ---
@@ -65,10 +65,10 @@ No preparation of post-quantum cryptographic attacks and data silently gathering
 Digital Hygiene is a layered AI defense system.
 
 **The first layer** is the EffectiveThreatDetector a ResNet-style MLP that is trained on 12 threat classes both based on classical network attacks (DDoS, DoS, brute force, spoofing, Mirai/IoT botnet, web-based attacks, reconnaissance, and benign traffic) and four post-quantum threat types (PQ-Downgrade, PQ-HNDL, PQ-SideChannel, and PQ-Hybrid). It works in real time with a live network traffic and displays a threat class and confidence score.
-**The second layer** is the Explainability Engine - plain-language, context-aware, student-first module that receives the threat class and confidence score of the detector and generates a structured explanation and a 15-dimensional state vector encoding threat class, confidence level, system health and cryptographic strength.
-**The third layer** is the ImprovedResponseDQN - which is a reinforcement learning response agent that was trained using Double DQN and prioritized experience replay over 8,000 simulated threat events. It takes the 15-dim state vector at the Explainability Engine and chooses the suitable mitigation measure.
+**The second layer** is the Explainability Engine plain-language, context-aware, student-first module that receives the threat class and confidence score of the detector and generates a structured explanation and a 15-dimensional state vector encoding threat class, confidence level, system health and cryptographic strength.
+**The third layer** is the ImprovedResponseDQN which is a reinforcement learning response agent that was trained using Double DQN and prioritized experience replay over 8,000 simulated threat events. It takes the 15-dim state vector at the Explainability Engine and chooses the suitable mitigation measure.
 **The fourth layer** is Response execution, where the chosen mitigation measure is implemented, which may be an Ignore of non-malicious traffic, a Quick Scan or Full Scan, up to the Network Isolate, PQ-Crypto Upgrade, and Emergency Crypto Rotate responses to the most serious post-quantum threats.
-**LoRA Fine-tuned Detector** (upgrade to Layer one) - does not represent a distinct pipeline stage, but instead a much more parameter-efficient replacement of the baseline detector. It also uses the baseline pretrained weights as an input, freezes the encoder and residual shortcut, and only trains the deep features, classifier head, and lightweight LoRA adapter matrices (only 7.9% of the total parameters -14,744 trainable). On top of this fine-tuned detector a separate response agent is then trained. It is the best to use in domain adaptation between institutions without the need to retrain completely with the 0.056 MB adapter file.
+**LoRA Fine-tuned Detector** (upgrade to Layer one) does not represent a distinct pipeline stage, but instead a much more parameter-efficient replacement of the baseline detector. It also uses the baseline pretrained weights as an input, freezes the encoder and residual shortcut, and only trains the deep features, classifier head, and lightweight LoRA adapter matrices (only 7.9% of the total parameters -14,744 trainable). On top of this fine-tuned detector a separate response agent is then trained. It is the best to use in domain adaptation between institutions without the need to retrain completely with the 0.056 MB adapter file.
 
 
 ---
@@ -77,7 +77,7 @@ Digital Hygiene is a layered AI defense system.
 
 ### Why Synthetic Post-Quantum Threat Data?
 
-There is no public labeled dataset for post-quantum network-level attacks - because these attacks are either classified, not yet widely executed, or not yet captured in PCAP-level telemetry. This is an industry-wide gap, not a project limitation.
+There is no public labeled dataset for post-quantum network-level attacks because these attacks are either classified, not yet widely executed, or not yet captured in PCAP-level telemetry. This is an industry-wide gap, not a project limitation.
 
 Our synthetic generation applies class-specific feature perturbation patterns to samples drawn from the classical threat distribution:
 
@@ -103,11 +103,11 @@ Rule based system fail under uncertainty. Our RL agent is designed specifically 
 **Scenario A:** The system health is nominal, and Quick Scan is accurate with a 97% confidence level.
 **Scenario B:** recon found, confidence 54, weakened crypto strength, recent PQ flag enabled -> Full Scan or PQ-Crypto Upgrade can be justified; Quick Scan is probably insufficient.
 
-The rule based approach maps threat class action. The RL agent is (threat class x confidence x system health x crypto strength x PQ context) action. The response decisions that such a 15-dimensional state space generates cannot be reproduced by a fixed rule table without listing thousands of conditional branches - and still would not generalize to unknown confidence distributions.
+The rule based approach maps threat class action. The RL agent is (threat class x confidence x system health x crypto strength x PQ context) action. The response decisions that such a 15-dimensional state space generates cannot be reproduced by a fixed rule table without listing thousands of conditional branches and still would not generalize to unknown confidence distributions.
 
-The Double DQN  and Prioritized Experience Replay specifically focuses on the issue of Q-value overestimation in naive DQN in sparse-reward security settings. The prioritized replay makes sure that the agent will learn disproportionately on rare high-stakes events (PQ threats, low-confidence high-severity detections) - the authentic tail cases where rule-based systems fail to detect anything.
+The Double DQN  and Prioritized Experience Replay specifically focuses on the issue of Q-value overestimation in naive DQN in sparse-reward security settings. The prioritized replay makes sure that the agent will learn disproportionately on rare high-stakes events (PQ threats, low-confidence high-severity detections) the authentic tail cases where rule-based systems fail to detect anything.
 
-**Empirical validation:** RL agent selection correct response on 98.61% of PQ threats - the category that had to be generalized to using only a limited amount of training samples. The rule-based system would score 100% on seen and 0% on novel combination. The RL agent sacrifices perfect recall of the known cases to achieve strong generalization of the unknown cases.
+**Empirical validation:** RL agent selection correct response on 98.61% of PQ threats the category that had to be generalized to using only a limited amount of training samples. The rule-based system would score 100% on seen and 0% on novel combination. The RL agent sacrifices perfect recall of the known cases to achieve strong generalization of the unknown cases.
 
 ---
 
@@ -115,12 +115,12 @@ The Double DQN  and Prioritized Experience Replay specifically focuses on the is
 
 | Dimension | Answer |
 |---|---|
-| **Model size** | 0.87 MB baseline; 0.056 MB LoRA adapter - deployable on edge hardware |
-| **Inference speed** | CPU inference at 4 cores / 8 GB RAM; GPU optional - suitable for lab-scale real-time use |
-| **Multi-institution adaptation** | LoRA fine-tuning requires only 7.9% parameter updates - a new institution can adapt the model to its traffic profile without sharing raw data (federated learning extension planned) |
-| **Dataset scale** | Trained on CIC-IoT 2023 - a large-scale, heterogeneous IoT/network dataset covering 12 traffic classes |
-| **API surface** | Flask REST API with `/predict` and `/model_info` endpoints - integrable with SIEM, SOC dashboards, or browser extensions |
-| **Extensibility** | New threat classes can be added by extending the softmax head and fine-tuning via LoRA - no full retrain required |
+| **Model size** | 0.87 MB baseline; 0.056 MB LoRA adapter deployable on edge hardware |
+| **Inference speed** | CPU inference at 4 cores / 8 GB RAM; GPU optional suitable for lab-scale real-time use |
+| **Multi-institution adaptation** | LoRA fine-tuning requires only 7.9% parameter updates a new institution can adapt the model to its traffic profile without sharing raw data (federated learning extension planned) |
+| **Dataset scale** | Trained on CIC-IoT 2023 a large-scale, heterogeneous IoT/network dataset covering 12 traffic classes |
+| **API surface** | Flask REST API with `/predict` and `/model_info` endpoints integrable with SIEM, SOC dashboards, or browser extensions |
+| **Extensibility** | New threat classes can be added by extending the softmax head and fine-tuning via LoRA no full retrain required |
 
 Current limitation: real-time PCAP stream ingestion is not yet implemented (Scapy/DPDK integration is listed in future work). The current system operates on pre-extracted 39-feature flow vectors, consistent with standard NetFlow/IPFIX telemetry pipelines.
 
@@ -249,7 +249,7 @@ LORA_CONFIG = {
 | PQ-Downgrade, PQ-SideChannel | PQ-Crypto Upgrade | Cryptographic posture remediation |
 | PQ-HNDL, PQ-Hybrid | Emergency Crypto Rotate | Active exfiltration; immediate key invalidation |
 
-*Note: These are the agent's learned optimal actions under nominal confidence and system health. The RL agent deviates from this table when confidence is low or system state is degraded - which is precisely its advantage over static rule mappings.*
+*Note: These are the agent's learned optimal actions under nominal confidence and system health. The RL agent deviates from this table when confidence is low or system state is degraded which is precisely its advantage over static rule mappings.*
 
 ## Quick Start
 
@@ -317,7 +317,7 @@ Dataset: [CIC-IoT Dataset 2023 (Updated 2024)](https://www.kaggle.com/datasets/m
 
 Download and place the CSV files in a folder, then update `INPUT_FOLDER` in the notebooks before training.
 
-**Prototype configuration:** This is a research prototype. We sample 100,000 records from the full dataset to keep training tractable. After preprocessing, 39 features are retained per sample - non-numeric columns, zero-variance features, and columns with missing values are dropped, and all features are normalized using StandardScaler.
+**Prototype configuration:** This is a research prototype. We sample 100,000 records from the full dataset to keep training tractable. After preprocessing, 39 features are retained per sample non-numeric columns, zero-variance features, and columns with missing values are dropped, and all features are normalized using StandardScaler.
 
 ---
 
@@ -461,11 +461,11 @@ digital_hygiene/
 
 ### Baseline model
 
-Open and run `baseline_detector.ipynb` - trains `EffectiveThreatDetector` and saves `detector.pth` and `response_agent.pth`.
+Open and run `baseline_detector.ipynb`  trains `EffectiveThreatDetector` and saves `detector.pth` and `response_agent.pth`.
 
 ### LoRA fine-tuning
 
-Open and run `lora_enhanced_detector.ipynb` - loads `detector.pth`, applies LoRA adapters, saves `lora_adapter.pth` and `response_agent_lora.pth`.
+Open and run `lora_enhanced_detector.ipynb` loads `detector.pth`, applies LoRA adapters, saves `lora_adapter.pth` and `response_agent_lora.pth`.
 
 ---
 
