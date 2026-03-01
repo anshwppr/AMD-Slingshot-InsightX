@@ -8,7 +8,7 @@
 
 It started with a conversation most people never think about until it's too late.
 
-Imagine a first-year student — call him Cipher — sitting in a university computer lab, clicking what looks like a routine email from the registrar's office. The link looks right. The logo looks right. Forty-eight hours later, his login credentials are circulating on a paste site he's never heard of. His academic record has been accessed. His scholarship application is gone. He didn't do anything wrong. He just didn't know.
+Imagine a first-year student call him Cipher sitting in a university computer lab, clicking what looks like a routine email from the registrar's office. The link looks right. The logo looks right. Forty-eight hours later, his login credentials are circulating on a paste site he's never heard of. His academic record has been accessed. His scholarship application is gone. He didn't do anything wrong. He just didn't know.
 
 Now multiply Cipher by the tens of thousands of students who walk into labs, click on links, share files on public Wi-Fi, and assume that if a connection is encrypted, it's safe. They're not careless. They're just not equipped.
 
@@ -18,9 +18,9 @@ That's the gap we set out to close.
 
 ## The Problem
 
-Phishing, malware, spoofing, and data misuse are not abstract threats. They hit students, labs, and institutions every day — and the tools designed to stop them are either invisible to the people who need them most, or so technical that they generate alerts nobody reads.
+Phishing, malware, spoofing, and data misuse are not abstract threats. They hit students, labs, and institutions every day and the tools designed to stop them are either invisible to the people who need them most, or so technical that they generate alerts nobody reads.
 
-There's a second layer most people don't talk about yet: the **post-quantum threat**. Nation-state actors and sophisticated adversaries are already running "Harvest Now, Decrypt Later" campaigns — collecting encrypted traffic today with the plan to decrypt it once quantum computers are capable enough. For institutions holding long-term research data, medical records, or student PII, the threat isn't hypothetical. It's already in motion.
+There's a second layer most people don't talk about yet: the **post-quantum threat**. Nation-state actors and sophisticated adversaries are already running "Harvest Now, Decrypt Later" campaigns collecting encrypted traffic today with the plan to decrypt it once quantum computers are capable enough. For institutions holding long-term research data, medical records, or student PII, the threat isn't hypothetical. It's already in motion.
 
 The specific pain points:
 - No plain-language, real-time explanation of *why* something is dangerous
@@ -32,13 +32,14 @@ The specific pain points:
 
 ## The Solution: Digital Hygiene
 
-Digital Hygiene is an AI-powered, explainable post-quantum cybersecurity defense system built for educational institutions first — and extensible to any organization that handles sensitive data.
+Digital Hygiene is an AI-powered, explainable post-quantum cybersecurity defense system built for educational institutions first
+and extensible to any organization that handles sensitive data.
 
 **Layer one** is a ResNet-style threat detector trained on 12 threat classes spanning both classical network attacks (DDoS, DoS, brute force, spoofing, Mirai/IoT botnet, web-based attacks, reconnaissance, and benign traffic) and four post-quantum threat categories (PQ-Downgrade, PQ-HNDL, PQ-SideChannel, and PQ-Hybrid). It runs in real time against live network traffic and returns a confidence score alongside a structured explanation.
 
-**Layer two** is a reinforcement learning response agent trained with a Deep Q-Network and prioritized experience replay. It learns, across thousands of simulated threat events, how to select the right response action — from "Quick Scan" to "Emergency Crypto Rotate" — based on the detected threat class, confidence level, system health, and cryptographic strength.
+**Layer two** is a reinforcement learning response agent trained with a Deep Q-Network and prioritized experience replay. It learns, across thousands of simulated threat events, how to select the right response action from "Quick Scan" to "Emergency Crypto Rotate" based on the detected threat class, confidence level, system health, and cryptographic strength.
 
-**Layer three (NEW)** is a LoRA fine-tuned version of the detector — same architecture, same accuracy, but only **7.9% of parameters trained**. The adapter file is 13× smaller than the full model, making it ideal for domain adaptation across institutions without retraining from scratch.
+**Layer three (NEW)** is a LoRA fine-tuned version of the detector same architecture, same accuracy, but only **7.9% of parameters trained**. The adapter file is 13× smaller than the full model, making it ideal for domain adaptation across institutions without retraining from scratch.
 
 ---
 
@@ -270,11 +271,11 @@ curl -X POST http://localhost:5000/predict \
 
 ### Baseline model
 
-Open and run `baseline_detector.ipynb` — trains `EffectiveThreatDetector` and saves `detector.pth` and `response_agent.pth`.
+Open and run `baseline_detector.ipynb`trains `EffectiveThreatDetector` and saves `detector.pth` and `response_agent.pth`.
 
 ### LoRA fine-tuning
 
-Open and run `lora_enhanced_detector.ipynb` — loads `detector.pth`, applies LoRA adapters (rank=4), saves `lora_adapter.pth` and `response_agent_lora.pth`.
+Open and run `lora_enhanced_detector.ipynb` loads `detector.pth`, applies LoRA adapters (rank=4), saves `lora_adapter.pth` and `response_agent_lora.pth`.
 
 ---
 
