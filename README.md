@@ -54,8 +54,11 @@ And then there exists the second layer that everyone is not much discussing but 
 
 Specific pain points:
 No layman, real-time, explanation of why something is harmful.
+
 There is no adaptive system that becomes better with the development of threats.
+
 None of the awareness layers installed on students, first-year users not only security teams.
+
 No preparation of post-quantum cryptographic attacks and data silently gathering today.
 
 ---
