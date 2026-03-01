@@ -37,7 +37,7 @@ In contrast to traditional signature-based IDS tools, Digital Hygiene is plainly
 
 It began with a discussion that most individuals never consider until it is their time.
 
-Suppose that a first year student named Cipher is sitting in a university computer laboratory, clicking on what appears to be a normal e-mail message by the registrar office. The link looks right. The logo appears correct. 48 hours after, his login information is being sold on a paste site which he has never heard of. His school performance has been seen. His application to scholarship is lost. He didn't do anything wrong. He just didn't know.
+Suppose that a first year student named Cipher is sitting in a university computer laboratory, clicking on what appears to be a normal e-mail message by the registrar office. The link looks right, the logo appears fine. 48 hours after, his login information is being sold on a paste site which he has never heard of. His school performance has been seen. His application to scholarship is lost. He didn't do anything wrong. He just didn't know.
 
 And use that number times tens of thousands of students who enter laboratories, open links, upload files using open Wi-Fi, and believe that when there is encryption of a connection, it is secure. They're not careless. They're just not equipped.
 
