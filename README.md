@@ -434,6 +434,8 @@ digital_hygiene/
 +-- models/
     +-- lora_adapter.pth            # LoRA adapter weights (0.056 MB)
     +-- response_agent_lora.pth     # Response agent weights
+    +-- detector.pth                # Baseline detector weights (0.709 MB)
+    +-- response_agent.pth          # Baseline response agent weights
 ```
 
 ---
