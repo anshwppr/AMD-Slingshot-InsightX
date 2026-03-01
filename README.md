@@ -304,9 +304,9 @@ Download and place the CSV files in a folder, then update `INPUT_FOLDER` in the 
 
 ### Feature Count Explained: Why 39 and Why 47 Appears in the Code
 
-Anyone reading the code will notice two different numbers — 39 and 47 — appearing in different places. This section explains exactly where each comes from, why they differ, and why the authoritative feature count is 39.
+Anyone reading the code will notice two different numbers 39 and 47 appearing in different places. This section explains exactly where each comes from, why they differ, and why the authoritative feature count is 39.
 
-#### Where 39 comes from — the real preprocessing pipeline
+#### Where 39 comes from the real preprocessing pipeline
 
 When the CIC-IoT 2023 CSV files are present, `_preprocess_data()` runs the following four sequential filters on the raw data:
 
@@ -319,12 +319,12 @@ Step 4 — Drop zero-variance cols:  X.loc[:, variance > 0]
                                X_scaled.shape[1] = 39
 ```
 
-The output `X_scaled.shape[1]` — whatever survives all four filters — is what becomes `num_features`. For the CIC-IoT 2023 dataset this is **39**. This value is then passed directly to the model at construction time:
+The output `X_scaled.shape[1]` whatever survives all four filters is what becomes `num_features`. For the CIC-IoT 2023 dataset this is **39**. This value is then passed directly to the model at construction time:
 
 ```python
 detector = EffectiveThreatDetector(input_dim=num_features, num_classes=12)
 #                                              ↑
-#                              39 — from X_train.shape[1]
+#                              39 from X_train.shape[1]
 ```
 
 The code never hardcodes 39 anywhere. It is always determined dynamically at runtime from the actual data.
@@ -374,14 +374,14 @@ X_combined = np.vstack([X_classical, X_pq])
 #             (n_classical_rows, 39) + (n_pq_rows, 39) = (total_rows, 39)
 ```
 
-`np.vstack` combines arrays vertically — adding more samples, not more features. The final combined dataset is `(total_rows, 39)`.
+`np.vstack` combines arrays vertically adding more samples, not more features. The final combined dataset is `(total_rows, 39)`.
 
 #### Summary
 
 | Value | What it is | Where it appears | Used at runtime? |
 |-------|-----------|-----------------|-----------------|
-| **39** | Post-preprocessing feature count from CIC-IoT 2023 CSV | `X_train.shape[1]`, `num_features`, `input_dim` at model construction | ✅ Yes — always |
-| **47** | Hardcoded fallback default | Class `__init__` defaults, `_generate_synthetic_classical_data()` | ❌ No — never in real run |
+| **39** | Post-preprocessing feature count from CIC-IoT 2023 CSV | `X_train.shape[1]`, `num_features`, `input_dim` at model construction | Yes always |
+| **47** | Hardcoded fallback default | Class `__init__` defaults, `_generate_synthetic_classical_data()` |  No never in real run |
 
 The authoritative feature count for this project is **39**.
 
