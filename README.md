@@ -267,7 +267,7 @@ models/
 └── response_agent_lora.pth        ← LoRA response agent weights
 ```
 
-> The models folder is intentionally excluded from version control (see `.gitignore`).
+
 > Train your own using the notebooks, or download pre-trained weights separately.
 
 ### 5. Run the Flask backend
