@@ -148,9 +148,7 @@ Post-quantum threat classes (PQ-Downgrade, PQ-HNDL, PQ-SideChannel, PQ-Hybrid) a
 
 ### System Pipeline
 
-```
 ![System Architecture](system.jpeg)
-```
 
 ### Detection Model — EffectiveThreatDetector
 
